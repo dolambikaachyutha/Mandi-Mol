@@ -26,7 +26,7 @@ export const handler: Handler = async (event) => {
       headers: CORS_HEADERS,
       body: JSON.stringify({
         error: 'GNANI_NOT_CONFIGURED',
-        message: 'GNANI_API_KEY is missing on the server. Add it to .env and restart the dev server.',
+        message: 'GNANI_API_KEY is not configured on the server. Please add GNANI_API_KEY to your Vercel Project Settings → Environment Variables (or .env locally) and redeploy.',
       }),
     };
   }
