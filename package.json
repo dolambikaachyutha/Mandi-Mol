@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "vite --port=8888 --host=0.0.0.0 --strictPort",
-    "build": "vite build",
+    "build": "vite build && node ./scripts/build-api.js",
+    "build:api": "node ./scripts/build-api.js",
     "preview": "vite preview",
     "test": "vitest run",
     "clean": "rm -rf dist server.js",
