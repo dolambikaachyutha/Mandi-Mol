@@ -76,13 +76,15 @@ async function postJson(url: string, payload: unknown): Promise<Record<string, u
   });
 
   const contentType = res.headers.get('content-type') || '';
+  const responseBody = await res.text();
   if (!contentType.includes('application/json')) {
+    const detail = responseBody.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 240);
     throw new Error(
-      `${url} did not return JSON (status ${res.status}). Is the local API server running?`
+      `${url} returned a non-JSON response (HTTP ${res.status})${detail ? `: ${detail}` : '.'}`
     );
   }
 
-  const json = (await res.json()) as Record<string, unknown>;
+  const json = JSON.parse(responseBody) as Record<string, unknown>;
   if (!res.ok) {
     throw new Error(`HTTP_${res.status}: ${String(json.message || json.error || 'request failed')}`);
   }
