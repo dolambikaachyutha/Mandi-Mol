@@ -1,4 +1,4 @@
-import { Handler } from '@netlify/functions';
+import { Handler } from './types';
 import { getGnaniConfig, getProviderStatus, isEvonConfigured, isSpeechConfigured } from './_gnani';
 
 export const handler: Handler = async () => {

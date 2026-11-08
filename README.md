@@ -90,31 +90,18 @@ cp .env.example .env    # then set GNANI_API_KEY
 # 3. Start the app and its local voice functions
 npm run dev
 ```
-Open [http://localhost:8888](http://localhost:8888). The Vite server also
-mounts the Netlify functions at `/.netlify/functions/*`; no separate Netlify
-CLI process is needed for local voice testing. Confirm the function is
-reachable at [http://localhost:8888/.netlify/functions/health](http://localhost:8888/.netlify/functions/health).
-Its JSON should report `configured.gnani: true` when `GNANI_API_KEY` is loaded.
+Open [http://localhost:8888](http://localhost:8888). Vite mounts the same
+server handlers used by the Vercel API routes. Confirm the health endpoint at
+[http://localhost:8888/api/health](http://localhost:8888/api/health). Its JSON
+should report `configured.gnani: true` when `GNANI_API_KEY` is loaded.
 The app interface is available in English, Hindi, Telugu, Bengali, and Tamil.
 Set `VITE_MOCK=true` to disable live speech services while working on the UI;
 speech transcription will not use a canned transcript.
 
-### Full Stack with the Netlify CLI
-
-Alternatively, run Netlify's local runtime:
-
-```powershell
-$env:NODE_OPTIONS = '--require dotenv/config'
-npx netlify dev --port 9999 --target-port 8888 --functions netlify/functions --no-open
-```
-
-Open [http://localhost:9999](http://localhost:9999). The Netlify CLI option
-proxies the Vite app running on port 8888.
-
 ---
 
 ## 6. How the Gnani Integration Works
-All provider-specific headers, endpoints, and parsing logic are isolated in **`netlify/functions/_gnani.ts`**:
+All provider-specific headers, endpoints, and parsing logic are isolated in **`server/functions/_gnani.ts`**:
 ```typescript
 // Prisma STT: POST https://api.vachana.ai/stt/v3  (multipart, header X-API-Key-ID)
 // Timbre TTS: POST https://api.vachana.ai/api/v1/tts/inference  (JSON in, binary audio out)
@@ -131,21 +118,34 @@ export function getGnaniConfig() {
 ```
 Recorded browser audio is converted to 16 kHz mono WAV before upload (Prisma does not accept WEBM).
 
-**Evon is waitlist-gated.** When `EVON_ENDPOINT` and `EVON_API_KEY` are set, Lalaji's turns and the coaching scorecard come from Evon. Until then `netlify/functions/_brain.ts` produces the same JSON contract with auditable rules, and the UI labels the reasoning provider as `ENGINE` in the status chips and the Under the Hood console.
+**Evon is waitlist-gated.** When `EVON_ENDPOINT` and `EVON_API_KEY` are set, Lalaji's turns and the coaching scorecard come from Evon. Until then `server/functions/_brain.ts` produces the same JSON contract with auditable rules, and the UI labels the reasoning provider as `ENGINE` in the status chips and the Under the Hood console.
 
 ---
 
-## 7. Deployment Instructions (Netlify)
-1. Push repository to GitHub.
-2. Link repository in Netlify Dashboard.
-3. Configure environment variables in Netlify site settings:
-   - `GNANI_API_KEY`: Your Gnani API key (required)
+## 7. Deploying to Vercel
+1. Push this project to GitHub.
+2. In Vercel, choose **Add New → Project**, import the repository, and set the project root to this app's folder if prompted.
+3. Vercel detects the `vercel.json` settings: Vite build command `npm run build`, output folder `dist`, Node.js 22 API functions, and SPA routing.
+4. In **Project → Settings → Environment Variables**, add `GNANI_API_KEY` with the Gnani-issued key. Keep it server-side (no `VITE_` prefix) and select **Production**. Add it for **Preview** too if you want voice on preview deployments. Never commit `.env` or paste the key into source files.
+5. Optionally add these environment variables for the required deployment environments (Production, and Preview if desired):
    - `GNANI_BASE_URL`: `https://api.vachana.ai`
    - `GNANI_STT_MODEL`: `prisma-v3.0`
    - `GNANI_TTS_MODEL`: `timbre-v3.0`
    - `GNANI_TTS_VOICE_HINGLISH` / `_HINDI` / `_TELUGU` / `_ENGLISH`: `Avinash`
    - `EVON_ENDPOINT` / `EVON_API_KEY`: optional, only if Evon is provisioned
-4. Deploy the site. Security headers and microphone policy are pre-configured in `netlify.toml`.
+6. Do not set `VITE_MOCK=true` in Vercel; remove it or set it to `false`.
+7. Save the variables and deploy. When a variable changes later, redeploy so the API functions receive the update.
+8. Verify `https://<your-domain>/api/health` reports `"configured":{"gnani":true}` and Prisma/Timbre as `live`. The health response never returns the API key itself.
+
+You can also configure the key without putting it in a shell command:
+```powershell
+npx vercel login
+npx vercel link
+npx vercel env add GNANI_API_KEY production
+npx vercel --prod
+```
+Vercel prompts securely for the value. Add the variable separately for `preview`
+if preview deployments should also have voice support.
 
 ---
 

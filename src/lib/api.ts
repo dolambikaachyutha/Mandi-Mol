@@ -78,7 +78,7 @@ async function postJson(url: string, payload: unknown): Promise<Record<string, u
   const contentType = res.headers.get('content-type') || '';
   if (!contentType.includes('application/json')) {
     throw new Error(
-      `${url} did not return JSON (status ${res.status}). Is the Netlify function server running?`
+      `${url} did not return JSON (status ${res.status}). Is the local API server running?`
     );
   }
 
@@ -91,7 +91,7 @@ async function postJson(url: string, payload: unknown): Promise<Record<string, u
 
 export async function checkProviderHealth(): Promise<ProviderHealth> {
   try {
-    const res = await fetch('/.netlify/functions/health');
+    const res = await fetch('/api/health');
     if (!res.ok || !(res.headers.get('content-type') || '').includes('application/json')) {
       throw new Error(`health HTTP ${res.status}`);
     }
@@ -157,7 +157,7 @@ export async function transcribeAudio(
   }
 
   const base64 = await blobToBase64(blob);
-  const json = await postJson('/.netlify/functions/stt', {
+  const json = await postJson('/api/stt', {
     audioBase64: base64,
     mimeType,
     languageCode,
@@ -183,7 +183,7 @@ export async function synthesizeSpeech(
 
   if (!isMockForced) {
     try {
-      const json = await postJson('/.netlify/functions/tts', { text, voiceCode, languageCode });
+      const json = await postJson('/api/tts', { text, voiceCode, languageCode });
       const mime = String(json.mime || 'audio/mpeg').split(';')[0];
 
       return {
@@ -217,7 +217,7 @@ export async function requestTraderTurn(payload: TraderTurnRequest): Promise<Tra
 
   if (!isMockForced) {
     try {
-      const json = await postJson('/.netlify/functions/trader', payload);
+      const json = await postJson('/api/trader', payload);
       const offer = Number(json.offer);
 
       if (Number.isFinite(offer) && typeof json.line === 'string') {
@@ -285,7 +285,7 @@ export async function requestCoachScorecard(payload: {
 }): Promise<CoachFeedback> {
   if (!isMockForced) {
     try {
-      const json = await postJson('/.netlify/functions/coach', payload);
+      const json = await postJson('/api/coach', payload);
       return {
         wentWell: Array.isArray(json.wentWell) ? (json.wentWell as string[]) : [],
         missed: Array.isArray(json.missed) ? (json.missed as string[]) : [],

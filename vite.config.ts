@@ -3,22 +3,23 @@ import react from '@vitejs/plugin-react';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {defineConfig, loadEnv} from 'vite';
-import {netlifyFunctionsDevPlugin} from './server/devApiPlugin.ts';
+import {apiDevPlugin} from './server/devApiPlugin.ts';
 
-export default defineConfig(({mode}) => {
-  // Make server-side variables (GNANI_API_KEY, voice/model overrides) available
-  // to the Netlify function handlers that run inside the dev server.
-  const env = loadEnv(mode, process.cwd(), '');
-  for (const [key, value] of Object.entries(env)) {
-    if (process.env[key] === undefined) process.env[key] = value;
+export default defineConfig(({mode, command}) => {
+  if (command === 'serve') {
+    // Load server-side variables only for the local function middleware.
+    const env = loadEnv(mode, process.cwd(), '');
+    for (const [key, value] of Object.entries(env)) {
+      if (process.env[key] === undefined) process.env[key] = value;
+    }
   }
 
   return {
     plugins: [
       react(),
       tailwindcss(),
-      netlifyFunctionsDevPlugin({
-        functionsDir: path.join(process.cwd(), 'netlify', 'functions'),
+      apiDevPlugin({
+        functionsDir: path.join(process.cwd(), 'server', 'functions'),
       }),
     ],
     resolve: {

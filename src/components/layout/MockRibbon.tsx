@@ -17,7 +17,7 @@ export const MockRibbon: React.FC = () => {
           NOTICE
         </span>
         <span>
-          MOCK MODE ACTIVE: Running local deterministic Gnani stubs. Set GNANI_API_KEY in .env for production.
+          MOCK MODE ACTIVE: Configure GNANI_API_KEY in your hosting environment variables, then redeploy.
         </span>
       </div>
       <span className="hidden sm:inline text-[11px] underline">

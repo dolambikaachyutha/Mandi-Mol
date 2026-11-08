@@ -1,4 +1,4 @@
-import { Handler } from '@netlify/functions';
+import { Handler } from './types';
 import { callEvonInference, isEvonConfigured } from './_gnani';
 import { buildTraderDecision, TraderBrainPayload, TraderDecision } from './_brain';
 

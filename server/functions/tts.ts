@@ -1,4 +1,4 @@
-import { Handler } from '@netlify/functions';
+import { Handler } from './types';
 import { callTimbreTts, getGnaniConfig, isSpeechConfigured } from './_gnani';
 
 const CORS_HEADERS: Record<string, string> = {

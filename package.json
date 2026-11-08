@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "vite --port=8888 --host=0.0.0.0 --strictPort",
     "build": "vite build",
@@ -27,7 +30,6 @@
     "zustand": "^5.0.16"
   },
   "devDependencies": {
-    "@netlify/functions": "^6.0.3",
     "@types/canvas-confetti": "^1.9.0",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",

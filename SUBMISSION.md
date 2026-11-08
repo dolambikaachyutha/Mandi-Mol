@@ -32,11 +32,11 @@ Mandi Mol simulates a high-stakes, 4–8 round mandi bargaining session:
 
 | Technology | Product | Exact Role in Mandi Mol | Implementation File |
 | :--- | :--- | :--- | :--- |
-| **Prisma** | Speech-to-Text | Transcribes farmer's spoken regional speech with code-mix script detection. | `netlify/functions/stt.ts`, `src/lib/api.ts` |
-| **Evon** | Reasoning & LLM | Drives Lalaji's psychological trick choices, mood changes, and generates the rupee-focused post-negotiation coaching scorecard. | `netlify/functions/trader.ts`, `netlify/functions/coach.ts` |
-| **Timbre** | Text-to-Speech | Synthesizes authentic, brisk Hindi/Telugu trader voice lines with client-side lipsync. Includes in-memory caching and graceful fallback to typewriter subtitles. | `netlify/functions/tts.ts`, `src/lib/audio.ts` |
+| **Prisma** | Speech-to-Text | Transcribes farmer's spoken regional speech with code-mix script detection. | `server/functions/stt.ts`, `src/lib/api.ts` |
+| **Evon** | Reasoning & LLM | Drives Lalaji's psychological trick choices, mood changes, and generates the rupee-focused post-negotiation coaching scorecard. | `server/functions/trader.ts`, `server/functions/coach.ts` |
+| **Timbre** | Text-to-Speech | Synthesizes authentic, brisk Hindi/Telugu trader voice lines with client-side lipsync. Includes in-memory caching and graceful fallback to typewriter subtitles. | `server/functions/tts.ts`, `src/lib/audio.ts` |
 
-*Prisma and Timbre run live against the Gnani API. Evon is waitlist-gated: when `EVON_ENDPOINT`/`EVON_API_KEY` are present, trader turns and coaching come from Evon; otherwise a deterministic rule engine (`netlify/functions/_brain.ts`) returns the identical JSON contract. No third-party AI vendor is substituted, and the UI labels the reasoning provider as ENGINE rather than hiding the fallback.*
+*Prisma and Timbre run live against the Gnani API. Evon is waitlist-gated: when `EVON_ENDPOINT`/`EVON_API_KEY` are present, trader turns and coaching come from Evon; otherwise a deterministic rule engine (`server/functions/_brain.ts`) returns the identical JSON contract. No third-party AI vendor is substituted, and the UI labels the reasoning provider as ENGINE rather than hiding the fallback.*
 
 ---
 
@@ -79,7 +79,7 @@ A fundamental design flaw in conversational AI apps is letting an LLM generate f
 
 | Contributor | Core Responsibility | Key Deliverables |
 | :--- | :--- | :--- |
-| **Full-Stack Engineer** | Core Engine & Gnani AI Integration | FSM state machine, MandiGameEngine invariants, Vitest test harness, Netlify Functions (`_gnani.ts`, `stt.ts`, `tts.ts`, `trader.ts`, `coach.ts`), Web Audio procedural noise mixer. |
+| **Full-Stack Engineer** | Core Engine & Gnani AI Integration | FSM state machine, MandiGameEngine invariants, Vitest test harness, Vercel API functions (`_gnani.ts`, `stt.ts`, `tts.ts`, `trader.ts`, `coach.ts`), Web Audio procedural noise mixer. |
 | **Product Designer** | Visual Identity & Motion Design | "Mandi Poster / Truck-Art Ledger" visual tokens, SVG Lalaji avatar with amplitude-synced lip movement, typewriter speech bubble, rubber stamp buttons, responsive mobile layout (360px+). |
 
 ---
@@ -127,4 +127,4 @@ https://ais-dev-inpfyeqlmk7g54ok2ywg25-726615417637.asia-southeast1.run.app?judg
 | 9 | **Mobile 360px Viewport** | UI displays without horizontal overflow; touch targets $\ge 48\text{px}$. | ✅ PASSED |
 | 10 | **Reduced Motion** | Respects `prefers-reduced-motion`; disables heavy shakes while keeping clean transitions. | ✅ PASSED |
 | 11 | **iOS Safari Compatibility** | Uses `audio/mp4` MediaRecorder fallback; unlocks Web Audio context on first tap. | ✅ PASSED |
-| 12 | **Netlify Deploy Over HTTPS** | `netlify.toml` configures microphone permissions policy and security headers. | ✅ PASSED |
+| 12 | **HTTPS Deployment** | `vercel.json` configures SPA routing, microphone permissions policy, and security headers. | ✅ PASSED |

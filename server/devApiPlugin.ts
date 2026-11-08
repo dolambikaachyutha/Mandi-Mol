@@ -1,6 +1,5 @@
 /**
- * Vite dev middleware that mounts the Netlify functions at
- * /.netlify/functions/<name> exactly like the production host does.
+ * Vite dev middleware that mounts API handlers at /api/<name>.
  *
  * The handlers are loaded through Vite's SSR module runner so TypeScript,
  * path aliases and edits are picked up without a separate build step.
@@ -11,9 +10,9 @@ import path from 'node:path';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Plugin, ViteDevServer } from 'vite';
 
-const FUNCTION_PREFIX = '/.netlify/functions/';
+const FUNCTION_PREFIX = '/api/';
 
-interface NetlifyLikeResult {
+interface ApiHandlerResult {
   statusCode?: number;
   headers?: Record<string, string | number | boolean | undefined>;
   body?: string;
@@ -73,8 +72,8 @@ async function handleFunctionRequest(
   };
 
   const module = (await server.ssrLoadModule(filePath)) as {
-    handler?: (event: unknown, context: unknown) => Promise<NetlifyLikeResult> | NetlifyLikeResult;
-    default?: (event: unknown, context: unknown) => Promise<NetlifyLikeResult> | NetlifyLikeResult;
+    handler?: (event: unknown) => Promise<ApiHandlerResult> | ApiHandlerResult;
+    default?: (event: unknown) => Promise<ApiHandlerResult> | ApiHandlerResult;
   };
 
   const handler = module.handler || module.default;
@@ -83,7 +82,7 @@ async function handleFunctionRequest(
     return;
   }
 
-  const result = await handler(event, {});
+  const result = await handler(event);
   res.statusCode = result?.statusCode || 200;
 
   for (const [key, value] of Object.entries(result?.headers || {})) {
@@ -93,9 +92,9 @@ async function handleFunctionRequest(
   res.end(result?.body ?? '');
 }
 
-export function netlifyFunctionsDevPlugin(options: { functionsDir: string }): Plugin {
+export function apiDevPlugin(options: { functionsDir: string }): Plugin {
   return {
-    name: 'mandi-netlify-functions-dev',
+    name: 'mandi-api-dev',
     apply: 'serve',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
@@ -107,7 +106,7 @@ export function netlifyFunctionsDevPlugin(options: { functionsDir: string }): Pl
 
         handleFunctionRequest(server, options.functionsDir, req, res).catch((error: unknown) => {
           const message = error instanceof Error ? error.stack || error.message : String(error);
-          server.config.logger.error(`[netlify-functions] ${req.url} failed: ${message}`);
+          server.config.logger.error(`[api-handler] ${req.url} failed: ${message}`);
           if (!res.headersSent) {
             sendJson(res, 500, { error: 'FUNCTION_CRASHED', message: message.split('\n')[0] });
           } else {
