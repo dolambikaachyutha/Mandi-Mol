@@ -1,4 +1,4 @@
-import { Handler } from './types';
+import type { Handler } from './types';
 import { getGnaniConfig, getProviderStatus, isEvonConfigured, isSpeechConfigured } from './_gnani';
 
 export const handler: Handler = async () => {

@@ -1,6 +1,6 @@
-import { Handler } from './types';
+import type { Handler } from './types';
 import { callEvonInference, isEvonConfigured } from './_gnani';
-import { buildCoachFallback, CoachPayload } from './_brain';
+import { buildCoachFallback, type CoachPayload } from './_brain';
 
 const CORS_HEADERS: Record<string, string> = {
   'Access-Control-Allow-Origin': '*',

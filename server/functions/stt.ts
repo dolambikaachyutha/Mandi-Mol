@@ -1,4 +1,4 @@
-import { Handler } from './types';
+import type { Handler } from './types';
 import { callPrismaStt, isSpeechConfigured } from './_gnani';
 
 const CORS_HEADERS: Record<string, string> = {
