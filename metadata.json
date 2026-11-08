@@ -1,0 +1,6 @@
+{
+  "name": "Mandi Mol - Voice Bargaining Simulator",
+  "description": "Voice-first mandi negotiation simulator empowering farmers to bargain with tough AI traders using Gnani AI Prisma, Evon, and Timbre.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

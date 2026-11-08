@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-cream: #F6EBD3;
+    --text-ink: #1B1B3A;
+    --color-turmeric: #F2B705;
+    --color-chilli: #D62828;
+    --color-leaf: #2D6A4F;
+    --color-jute: #8B5E34;
+    --color-sky: #CFE8F0;
+    --bg-night-mandi: #12122B;
+    --card-night-mandi: #1A1A3A;
+  }
+
+  body {
+    font-family: 'Mukta', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-cream);
+    color: var(--text-ink);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Rozha One', 'Mukta', serif;
+  }
+
+  code, pre, .font-mono, .tabular-nums {
+    font-family: 'DM Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Rubber Stamp button styles */
+.stamp-btn {
+  position: relative;
+  font-weight: 700;
+  border: 2.5px solid #1B1B3A;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0px #1B1B3A;
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.stamp-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px #1B1B3A;
+}
+
+.stamp-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #1B1B3A;
+}
+
+.stamp-btn-dark {
+  border: 2.5px solid #CFE8F0;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.7);
+}
+
+.stamp-btn-dark:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.7);
+}
+
+.stamp-btn-dark:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.7);
+}
+
+/* Paper Ledger & Ticket Card Styles */
+.mandi-card {
+  border: 2.5px solid #1B1B3A;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0px #1B1B3A;
+  background-color: #FFFDF9;
+}
+
+.mandi-card-dark {
+  border: 2px solid #2E2E5D;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0px #090918;
+  background-color: #1A1A3A;
+}
+
+/* Paper Grain Texture */
+.paper-grain {
+  background-image: radial-gradient(#1b1b3a0c 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Truck Art Marigold Border Stripe */
+.truck-border {
+  background: repeating-linear-gradient(
+    45deg,
+    #D62828,
+    #D62828 12px,
+    #F2B705 12px,
+    #F2B705 24px,
+    #2D6A4F 24px,
+    #2D6A4F 36px,
+    #1B1B3A 36px,
+    #1B1B3A 48px
+  );
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F6EBD3;
+}
+::-webkit-scrollbar-thumb {
+  background: #8B5E34;
+  border-radius: 4px;
+}
