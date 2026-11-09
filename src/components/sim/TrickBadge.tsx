@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { Lightbulb } from 'lucide-react';
 import { TRICKS } from '../../lib/tricks';
+import { TrickIcon } from '../common/TrickIcon';
 import { TrickId } from '../../types';
 
 interface TrickBadgeProps {
@@ -19,7 +21,7 @@ export const TrickBadge: React.FC<TrickBadgeProps> = ({
     <div className="my-2 p-3 bg-red-50 border-2 border-[#D62828] rounded-xl shadow-[3px_3px_0px_#D62828] animate-shake">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-xl">{trick.icon}</span>
+          <TrickIcon trickId={trick.id} className="w-5 h-5" />
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-black uppercase tracking-wider text-[#D62828]">
@@ -41,8 +43,11 @@ export const TrickBadge: React.FC<TrickBadgeProps> = ({
 
       {(showTip || revealed) && (
         <div className="mt-2.5 pt-2.5 border-t border-red-200 text-xs bg-white p-2 rounded border border-red-100">
-          <span className="font-bold text-[#2D6A4F]">💡 Counter it by: </span>
-          <span className="text-slate-800">{trick.counterTip}</span>
+          <span className="font-bold text-[#2D6A4F] inline-flex items-center gap-1">
+            <Lightbulb className="w-3.5 h-3.5" />
+            <span>Counter it by: </span>
+          </span>
+          <span className="text-slate-800 ml-1">{trick.counterTip}</span>
         </div>
       )}
     </div>

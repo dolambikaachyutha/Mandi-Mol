@@ -5,6 +5,8 @@ import { audioManager } from '../lib/audio';
 import { convertToPrismaWav } from '../lib/wav';
 import { CROPS_LIST } from '../lib/crops';
 import { CropIcon } from '../components/common/CropIcon';
+import { useGame } from '../store/useGame';
+import { t } from '../lib/i18n';
 import type { MandiPriceItem, NearbyMandiItem, PriceAlert } from '../types';
 
 interface PricesPageProps {
@@ -56,6 +58,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
   onStartPracticeWithCrop,
   onOpenPlannerWithCrop,
 }) => {
+  const { uiLanguage, language } = useGame();
   const [prices, setPrices] = useState<MandiPriceItem[]>(DEFAULT_BASELINE_PRICES);
   const [nearby, setNearby] = useState<NearbyMandiItem[]>(DEFAULT_BASELINE_NEARBY);
   const [userMandi, setUserMandi] = useState('Warangal APMC Yard');
@@ -121,17 +124,20 @@ export const PricesPage: React.FC<PricesPageProps> = ({
         reader.onloadend = async () => {
           const base64 = (reader.result as string).split(',')[1];
           try {
+            const activeLanguageCode = language.prismaCode || language.code || 'hi-IN';
             const result = await queryMandiVoice({
               audioBase64: base64,
               mandiLocation: userMandi,
-              languageCode: 'hinglish',
+              languageCode: activeLanguageCode,
             });
-            setVoiceQueryText(result.recognizedQuery);
-            setVoiceAnswer(result.data.spokenAnswer);
+            setVoiceQueryText(result.recognizedQuery || '');
+            const spoken = result.data?.spokenAnswer || (result as any).spokenText || (result as any).spokenAnswer || result.recognizedQuery;
+            setVoiceAnswer(spoken || 'Price data retrieved.');
 
-            if (result.audioReplyBase64) {
-              setVoiceAudioBase64(result.audioReplyBase64);
-              const audio = new Audio(`data:audio/mp3;base64,${result.audioReplyBase64}`);
+            const audioReply = result.audioReplyBase64 || (result as any).audioBase64;
+            if (audioReply) {
+              setVoiceAudioBase64(audioReply);
+              const audio = new Audio(`data:audio/mp3;base64,${audioReply}`);
               audio.play().catch((e) => console.warn('Audio autoplay prevented:', e));
             }
           } catch (e) {
@@ -164,14 +170,18 @@ export const PricesPage: React.FC<PricesPageProps> = ({
 
     try {
       setIsVoiceLoading(true);
+      const activeLanguageCode = language.prismaCode || language.code || 'hi-IN';
       const result = await queryMandiVoice({
         queryText: voiceQueryText,
         mandiLocation: userMandi,
-        languageCode: 'hinglish',
+        languageCode: activeLanguageCode,
       });
-      setVoiceAnswer(result.data.spokenAnswer);
-      if (result.audioReplyBase64) {
-        const audio = new Audio(`data:audio/mp3;base64,${result.audioReplyBase64}`);
+      const spoken = result.data?.spokenAnswer || (result as any).spokenText || (result as any).spokenAnswer;
+      setVoiceAnswer(spoken || 'Price data retrieved.');
+      const audioReply = result.audioReplyBase64 || (result as any).audioBase64;
+      if (audioReply) {
+        setVoiceAudioBase64(audioReply);
+        const audio = new Audio(`data:audio/mp3;base64,${audioReply}`);
         audio.play().catch((e) => console.warn('Audio playback blocked:', e));
       }
     } catch (e) {
@@ -217,7 +227,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black font-display text-[#F2B705]">
-            आज का मंडी भाव (Live Mandi Prices)
+            {t(uiLanguage, 'livePrices')} (Agmarknet Live)
           </h1>
           <p className="text-xs text-stone-300 mt-1">
             Certified wholesale auction benchmark rates. Zero invented numbers.
@@ -265,17 +275,17 @@ export const PricesPage: React.FC<PricesPageProps> = ({
 
           <div className="flex-1 w-full text-center md:text-left">
             <h2 className="text-base sm:text-lg font-black text-[#1B1B3A]">
-              {isRecording ? 'सुन रहे हैं... (Listening...)' : 'बोलकर भाव पूछें (Ask Price by Voice)'}
+              {isRecording ? t(uiLanguage, 'listeningVoice') : t(uiLanguage, 'askVoice')}
             </h2>
             <p className="text-xs text-stone-600 mb-2">
-              Prisma STT & Timbre TTS powered: Say <i>"Aaj tamatar ka bhav kya hai?"</i> or <i>"mirchi ka rate batao"</i>
+              Prisma STT & Timbre TTS powered: Say <i>"Aaj tamatar ka bhav kya hai?"</i>, <i>"mirchi ka rate batao"</i> or <i>"మిర్చి రేటు ఎంత?"</i>
             </p>
 
             {/* Quick Text Input fallback */}
             <form onSubmit={handleTextQuerySubmit} className="flex gap-2">
               <input
                 type="text"
-                placeholder='या टाइप करें: "Tamatar ka bhav", "Mirchi rate"'
+                placeholder='उदा. "Tamatar ka bhav", "Mirchi rate", "మిర్చి ధర"'
                 value={voiceQueryText}
                 onChange={(e) => setVoiceQueryText(e.target.value)}
                 className="flex-1 px-3 py-2 text-xs rounded-xl border-2 border-[#1B1B3A] bg-white font-medium focus:outline-none focus:ring-2 focus:ring-[#F2B705]"
@@ -285,7 +295,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
                 disabled={isVoiceLoading}
                 className="px-4 py-2 bg-[#1B1B3A] text-[#F2B705] text-xs font-bold rounded-xl hover:bg-[#2A2A5A] transition-colors"
               >
-                {isVoiceLoading ? 'खोज रहे हैं...' : 'पूछें (Search)'}
+                {isVoiceLoading ? '...' : t(uiLanguage, 'searchBtn')}
               </button>
             </form>
           </div>
@@ -315,7 +325,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-xl font-black font-display text-[#1B1B3A]">
-              प्रमुख फसलों के दैनिक भाव (Today's Benchmark Rates)
+              {t(uiLanguage, 'benchmarkRates')}
             </h2>
             <p className="text-xs text-stone-600">
               Quoted per Quintal (100 kg) & converted to ₹/kg for transparent farmer negotiation.
@@ -326,7 +336,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#1B1B3A] bg-white text-xs font-bold text-[#1B1B3A] hover:bg-amber-100 transition-colors"
           >
             <Bell className="w-4 h-4" />
-            <span>Set Price Alert</span>
+            <span>{t(uiLanguage, 'setPriceAlert')}</span>
           </button>
         </div>
 
@@ -438,7 +448,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
       {/* 4. Nearby Mandis Comparison Table (~100km radius) */}
       <div className="bg-white border-2 border-[#1B1B3A] rounded-2xl p-5 shadow-md mb-8">
         <h2 className="text-lg font-black text-[#1B1B3A] mb-1">
-          आस-पास की मंडियों की तुलना (Nearby Mandi Comparison - ~100 km)
+          {t(uiLanguage, 'nearbyComparison')}
         </h2>
         <p className="text-xs text-stone-600 mb-4">
           Compare spot prices before transporting your produce. Real net differences help decide if traveling further pays off.

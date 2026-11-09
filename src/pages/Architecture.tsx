@@ -1,4 +1,5 @@
 import React from 'react';
+import { ShieldCheck, Lock } from 'lucide-react';
 
 export const Architecture: React.FC = () => {
   const pipelineStages = [
@@ -118,7 +119,7 @@ export const Architecture: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="mandi-card p-6 bg-[#FFFDF8] border-2 border-[#1B1B3A] space-y-4">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🛡️</span>
+            <ShieldCheck className="w-6 h-6 text-emerald-600" />
             <h3 className="font-display text-xl font-bold text-[#1B1B3A]">
               Why the Engine Owns All Numbers
             </h3>
@@ -140,7 +141,7 @@ export const Architecture: React.FC = () => {
         {/* Privacy by Design */}
         <div className="mandi-card p-6 bg-[#FFFDF8] border-2 border-[#1B1B3A] space-y-4">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🔒</span>
+            <Lock className="w-6 h-6 text-sky-600" />
             <h3 className="font-display text-xl font-bold text-[#1B1B3A]">
               Privacy-by-Design Architecture
             </h3>

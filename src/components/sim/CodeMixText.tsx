@@ -1,4 +1,5 @@
 import React from 'react';
+import { Globe } from 'lucide-react';
 import { analyzeCodeMix, WordLanguage } from '../../lib/codemix';
 
 interface CodeMixTextProps {
@@ -46,8 +47,9 @@ export const CodeMixText: React.FC<CodeMixTextProps> = ({
       {/* Code-mix badge */}
       {analysis.isMixed && (
         <div className="flex items-center gap-2 text-xs">
-          <span className="bg-amber-200 text-[#1B1B3A] font-bold px-2 py-0.5 rounded border border-[#1B1B3A] text-[11px]">
-            🌐 Code-Mixed Speech Detected
+          <span className="bg-amber-200 text-[#1B1B3A] font-bold px-2 py-0.5 rounded border border-[#1B1B3A] text-[11px] inline-flex items-center gap-1">
+            <Globe className="w-3.5 h-3.5" />
+            <span>Code-Mixed Speech Detected</span>
           </span>
           <span className="text-[11px] text-slate-500">
             (Prisma STT script & vocabulary heuristic)

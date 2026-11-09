@@ -1,4 +1,5 @@
 import React from 'react';
+import { Activity, Search, AlertTriangle } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 
 export const UnderTheHood: React.FC = () => {
@@ -15,7 +16,10 @@ export const UnderTheHood: React.FC = () => {
       {/* Header */}
       <div className="p-4 border-b border-slate-700 bg-[#1A1A3A] flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-amber-400 font-bold text-sm">⚡ UNDER THE HOOD</span>
+          <span className="text-amber-400 font-bold text-sm flex items-center gap-1.5">
+            <Activity className="w-4 h-4" />
+            <span>UNDER THE HOOD</span>
+          </span>
           <span className="bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded text-[10px] border border-amber-400/40">
             JUDGE CONSOLE
           </span>
@@ -47,7 +51,7 @@ export const UnderTheHood: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {history.length === 0 ? (
           <div className="text-center py-12 text-slate-500">
-            <p className="text-2xl mb-2">🔍</p>
+            <Search className="w-8 h-8 mx-auto mb-2 text-slate-600" />
             <p>Awaiting first farmer voice turn...</p>
             <p className="text-[11px] text-slate-600 mt-1">
               Prisma STT, Evon reasoning bounds, and Timbre synthesis metrics will appear here live.
@@ -128,8 +132,9 @@ export const UnderTheHood: React.FC = () => {
 
                   {/* Highlighted Clamping Callout */}
                   {tel.engine.clamped && (
-                    <div className="mt-1.5 p-1.5 bg-red-950/80 border border-red-500/60 rounded text-[11px] text-red-300 font-semibold">
-                      ⚠️ {tel.engine.clampReason || 'Clamped to engine bounds.'}
+                    <div className="mt-1.5 p-1.5 bg-red-950/80 border border-red-500/60 rounded text-[11px] text-red-300 font-semibold flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>{tel.engine.clampReason || 'Clamped to engine bounds.'}</span>
                     </div>
                   )}
                 </div>

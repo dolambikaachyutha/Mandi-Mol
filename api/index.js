@@ -462,7 +462,10 @@ var TRICK_ORDER = [
 ];
 function detectLanguage(payload) {
   const code = (payload.languageCode || "").toLowerCase();
-  if (code === "hindi" || code === "telugu" || code === "hinglish" || code === "english") return code;
+  if (code === "hindi" || code === "hi" || code.startsWith("hi-")) return "hindi";
+  if (code === "telugu" || code === "te" || code.startsWith("te-")) return "telugu";
+  if (code === "english" || code === "en" || code.startsWith("en-")) return "english";
+  if (code === "hinglish") return "hinglish";
   const name = (payload.languageName || "").toLowerCase();
   if (name.includes("telugu")) return "telugu";
   if (name.includes("hindi") && !name.includes("hinglish")) return "hindi";
@@ -2544,14 +2547,14 @@ var CORS_HEADERS12 = {
 };
 function extractCommodity(text) {
   const lower = text.toLowerCase();
-  if (/mirch|chilli|teja|chilly/i.test(lower)) return "chilli";
-  if (/tamatar|tomato/i.test(lower)) return "tomato";
-  if (/gehun|gehu|wheat|sharbati/i.test(lower)) return "wheat";
-  if (/dhan|paddy|rice|chawal/i.test(lower)) return "paddy";
-  if (/pyaz|pyaj|onion/i.test(lower)) return "onion";
-  if (/kapas|cotton|rui/i.test(lower)) return "cotton";
-  if (/aloo|alu|potato/i.test(lower)) return "potato";
-  if (/soyabean|soybean/i.test(lower)) return "soybean";
+  if (/mirch|chilli|teja|chilly|మిర్చి|ఎండుమిర్చి|మిరప|తీపిమిర్చి|मिर्च|तीखी/i.test(lower)) return "chilli";
+  if (/tamatar|tomato|టమోటా|టొమాటో|టమాట|టమాటాలు|टमाटर/i.test(lower)) return "tomato";
+  if (/gehun|gehu|wheat|sharbati|గోధుమ|గోధుమలు|गेहूं|गेहुं/i.test(lower)) return "wheat";
+  if (/dhan|paddy|rice|chawal|వరి|వరిధాన్యం|బియ్యం|ధాన్యం|धान|चावल/i.test(lower)) return "paddy";
+  if (/pyaz|pyaj|onion|ఉల్లి|ఉల్లిపాయ|ఉల్లిగడ్డ|प्याज|कांदा/i.test(lower)) return "onion";
+  if (/kapas|cotton|rui|పత్తి|దూది|कपास|रुई/i.test(lower)) return "cotton";
+  if (/aloo|alu|potato|ఆలూ|బంగాళాదుంప|ఆలుగడ్డ|ఆలూగడ్డ|आलू|बटाटा/i.test(lower)) return "potato";
+  if (/soyabean|soybean|సోయా|సోయాబీన్|सोयाबीन|सोया/i.test(lower)) return "soybean";
   return "chilli";
 }
 var handler13 = async (event) => {
@@ -2585,22 +2588,51 @@ var handler13 = async (event) => {
     const commodityId = extractCommodity(transcript);
     const priceRows = await repository.getMandiPrices(commodityId);
     const primary = priceRows[0];
+    const isTelugu = typeof languageCode === "string" && (languageCode.startsWith("te") || languageCode === "telugu") || /[\u0C00-\u0C7F]/.test(transcript);
+    const isEnglish = typeof languageCode === "string" && (languageCode.startsWith("en") || languageCode === "english");
     if (!primary) {
+      let notFoundText = `\u092E\u093E\u092B \u0915\u0940\u091C\u093F\u090F, \u0906\u091C \u0915\u0947 Agmarknet \u092C\u0941\u0932\u0947\u091F\u093F\u0928 \u092E\u0947\u0902 ${commodityId} \u0915\u093E \u092D\u093E\u0935 \u0926\u0930\u094D\u091C \u0928\u0939\u0940\u0902 \u0939\u0948\u0964`;
+      if (isTelugu) {
+        notFoundText = `\u0C15\u0C4D\u0C37\u0C2E\u0C3F\u0C02\u0C1A\u0C02\u0C21\u0C3F, \u0C08\u0C30\u0C4B\u0C1C\u0C41 Agmarknet \u0C2C\u0C41\u0C32\u0C46\u0C1F\u0C3F\u0C28\u0C4D\u200C\u0C32\u0C4B ${commodityId} \u0C27\u0C30 \u0C28\u0C2E\u0C4B\u0C26\u0C41 \u0C15\u0C3E\u0C32\u0C47\u0C26\u0C41.`;
+      } else if (isEnglish) {
+        notFoundText = `Sorry, ${commodityId} price is not listed in today's Agmarknet bulletin.`;
+      }
       return {
         statusCode: 200,
         headers: CORS_HEADERS12,
         body: JSON.stringify({
           transcript,
+          recognizedQuery: transcript,
           found: false,
-          answer: `Maaf kijiye, aaj ke Agmarknet bulletin mein ${commodityId} ka bhav darj nahi hai.`
+          answer: notFoundText,
+          spokenText: notFoundText,
+          spokenAnswer: notFoundText,
+          data: {
+            crop: commodityId,
+            modalPricePerKg: 0,
+            modalPriceQuintal: 0,
+            minPricePerKg: 0,
+            maxPricePerKg: 0,
+            arrivalDate: "Today",
+            source: "Agmarknet",
+            spokenAnswer: notFoundText
+          }
         })
       };
     }
-    const spokenText = `Aaj ${primary.market} mein ${primary.commodity_name} ka modal bhav \u20B9${primary.modal_price_kg} prati kilo yani \u20B9${primary.modal_price} prati quintal hai. Kam se kam \u20B9${primary.min_price_kg} aur zyada se zyada \u20B9${primary.max_price_kg} chal raha hai.`;
+    let spokenText = "";
+    if (isTelugu) {
+      spokenText = `\u0C08\u0C30\u0C4B\u0C1C\u0C41 ${primary.market}\u0C32\u0C4B ${primary.commodity_name} \u0C38\u0C17\u0C1F\u0C41 \u0C27\u0C30 \u0C15\u0C3F\u0C32\u0C4B\u0C15\u0C41 \u20B9${primary.modal_price_kg} (\u0C15\u0C4D\u0C35\u0C3F\u0C02\u0C1F\u0C3E\u0C32\u0C4D\u200C\u0C15\u0C41 \u20B9${primary.modal_price}). \u0C15\u0C28\u0C40\u0C38 \u0C27\u0C30 \u20B9${primary.min_price_kg}, \u0C17\u0C30\u0C3F\u0C37\u0C4D\u0C1F \u0C27\u0C30 \u20B9${primary.max_price_kg} \u0C2A\u0C32\u0C41\u0C15\u0C41\u0C24\u0C4B\u0C02\u0C26\u0C3F.`;
+    } else if (isEnglish) {
+      spokenText = `Today in ${primary.market}, modal price for ${primary.commodity_name} is \u20B9${primary.modal_price_kg}/kg (\u20B9${primary.modal_price}/quintal). Range is \u20B9${primary.min_price_kg} to \u20B9${primary.max_price_kg}/kg.`;
+    } else {
+      spokenText = `\u0906\u091C ${primary.market} \u092E\u0947\u0902 ${primary.commodity_name} \u0915\u093E \u092E\u0949\u0921\u0932 \u092D\u093E\u0935 \u20B9${primary.modal_price_kg} \u092A\u094D\u0930\u0924\u093F \u0915\u093F\u0932\u094B \u092F\u093E\u0928\u0940 \u20B9${primary.modal_price} \u092A\u094D\u0930\u0924\u093F \u0915\u094D\u0935\u093F\u0902\u091F\u0932 \u0939\u0948\u0964 \u0928\u094D\u092F\u0942\u0928\u0924\u092E \u20B9${primary.min_price_kg} \u0914\u0930 \u0905\u0927\u093F\u0915\u0924\u092E \u20B9${primary.max_price_kg} \u091A\u0932 \u0930\u0939\u093E \u0939\u0948\u0964`;
+    }
     let audioBase64Out = "";
     if (isSpeechConfigured()) {
       try {
-        const tts = await callTimbreTts(spokenText, "Avinash", languageCode);
+        const ttsLang = isTelugu ? "te-IN" : isEnglish ? "en-IN" : "hi-IN";
+        const tts = await callTimbreTts(spokenText, "Avinash", ttsLang);
         audioBase64Out = tts.audioBase64;
       } catch {
       }
@@ -2610,6 +2642,8 @@ var handler13 = async (event) => {
       headers: CORS_HEADERS12,
       body: JSON.stringify({
         transcript,
+        recognizedQuery: transcript,
+        mandiLocation: primary.market,
         found: true,
         commodity: primary.commodity_name,
         market: primary.market,
@@ -2620,7 +2654,20 @@ var handler13 = async (event) => {
         arrivalDate: primary.arrival_date,
         source: primary.source,
         spokenText,
-        audioBase64: audioBase64Out
+        spokenAnswer: spokenText,
+        audioBase64: audioBase64Out,
+        audioReplyBase64: audioBase64Out,
+        ttsAvailable: !!audioBase64Out,
+        data: {
+          crop: primary.commodity_name,
+          modalPricePerKg: primary.modal_price_kg,
+          modalPriceQuintal: primary.modal_price,
+          minPricePerKg: primary.min_price_kg,
+          maxPricePerKg: primary.max_price_kg,
+          arrivalDate: primary.arrival_date,
+          source: primary.source,
+          spokenAnswer: spokenText
+        }
       })
     };
   } catch (err) {

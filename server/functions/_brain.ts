@@ -87,7 +87,10 @@ const TRICK_ORDER: TrickId[] = [
 
 function detectLanguage(payload: TraderBrainPayload): BrainLanguage {
   const code = (payload.languageCode || '').toLowerCase();
-  if (code === 'hindi' || code === 'telugu' || code === 'hinglish' || code === 'english') return code;
+  if (code === 'hindi' || code === 'hi' || code.startsWith('hi-')) return 'hindi';
+  if (code === 'telugu' || code === 'te' || code.startsWith('te-')) return 'telugu';
+  if (code === 'english' || code === 'en' || code.startsWith('en-')) return 'english';
+  if (code === 'hinglish') return 'hinglish';
 
   const name = (payload.languageName || '').toLowerCase();
   if (name.includes('telugu')) return 'telugu';

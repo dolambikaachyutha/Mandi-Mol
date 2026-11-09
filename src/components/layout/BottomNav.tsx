@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, Compass, Mic, FileText } from 'lucide-react';
+import { TrendingUp, Store, Compass, FileText, Mic } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { t } from '../../lib/i18n';
 
@@ -15,27 +15,79 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onNavigate }) 
     {
       id: 'prices',
       icon: TrendingUp,
-      label: uiLanguage === 'hi' ? 'आज का भाव' : uiLanguage === 'te' ? 'ధరలు' : 'Prices',
+      label:
+        uiLanguage === 'te'
+          ? 'ధరలు'
+          : uiLanguage === 'hi'
+          ? 'आज का भाव'
+          : uiLanguage === 'bn'
+          ? 'দর'
+          : uiLanguage === 'ta'
+          ? 'விலை'
+          : 'Prices',
       sublabel: 'Agmarknet',
       badge: 'LIVE',
     },
     {
-      id: 'planner',
-      icon: Compass,
-      label: uiLanguage === 'hi' ? 'प्लानर' : uiLanguage === 'te' ? 'ప్లానర్' : 'Plan',
-      sublabel: 'Pre-trip',
+      id: 'tradeboard',
+      icon: Store,
+      label:
+        uiLanguage === 'te'
+          ? 'వ్యాపారం'
+          : uiLanguage === 'hi'
+          ? 'व्यापार मंच'
+          : uiLanguage === 'bn'
+          ? 'বাণিজ্য'
+          : uiLanguage === 'ta'
+          ? 'வர்த்தகம்'
+          : 'Trade',
+      sublabel: 'Exchange',
+      badge: 'NEW',
     },
     {
-      id: 'simulator',
-      icon: Mic,
-      label: uiLanguage === 'hi' ? 'मोल-भाव' : uiLanguage === 'te' ? 'ప్రాక్టీస్' : 'Practice',
-      sublabel: 'Simulate',
+      id: 'planner',
+      icon: Compass,
+      label:
+        uiLanguage === 'te'
+          ? 'ప్లానర్'
+          : uiLanguage === 'hi'
+          ? 'प्लानर'
+          : uiLanguage === 'bn'
+          ? 'প্ল্যান'
+          : uiLanguage === 'ta'
+          ? 'திட்டம்'
+          : 'Plan',
+      sublabel: 'Pre-trip',
     },
     {
       id: 'deals',
       icon: FileText,
-      label: uiLanguage === 'hi' ? 'सौदा बही' : uiLanguage === 'te' ? 'డీల్స్' : 'My Deals',
+      label:
+        uiLanguage === 'te'
+          ? 'డీల్స్'
+          : uiLanguage === 'hi'
+          ? 'सौदा बही'
+          : uiLanguage === 'bn'
+          ? 'খতিয়ান'
+          : uiLanguage === 'ta'
+          ? 'ரசீது'
+          : 'My Deals',
       sublabel: 'Proof & Slip',
+    },
+    {
+      id: 'simulator',
+      icon: Mic,
+      label:
+        uiLanguage === 'te'
+          ? 'ప్రాక్టీస్'
+          : uiLanguage === 'hi'
+          ? 'प्रैक्टिस'
+          : uiLanguage === 'bn'
+          ? 'অনুশীলন'
+          : uiLanguage === 'ta'
+          ? 'பயிற்சி'
+          : 'Practice',
+      sublabel: 'Simulate',
     },
   ];
 
@@ -44,7 +96,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onNavigate }) 
       className="fixed bottom-0 left-0 right-0 z-40 bg-[#F6EBD3]/95 backdrop-blur-md border-t-[3px] border-[#1B1B3A] shadow-2xl safe-area-bottom"
       aria-label="Bottom Navigation"
     >
-      <div className="max-w-md mx-auto grid grid-cols-4 px-1 py-1.5">
+      <div className="max-w-md mx-auto grid grid-cols-5 px-1 py-1.5">
         {navItems.map((item) => {
           const isActive = currentTab === item.id;
           const Icon = item.icon;

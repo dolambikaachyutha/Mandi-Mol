@@ -1,4 +1,5 @@
 import React from 'react';
+import { BarChart3 } from 'lucide-react';
 import { useSessions } from '../../store/useSessions';
 
 export const PilotCharts: React.FC = () => {
@@ -95,7 +96,7 @@ export const PilotCharts: React.FC = () => {
       {/* Empty State vs Real Data */}
       {n === 0 ? (
         <div className="mandi-card p-12 text-center bg-[#FFFDF8] border-2 border-dashed border-slate-300 space-y-3">
-          <span className="text-4xl">📊</span>
+          <BarChart3 className="w-10 h-10 text-slate-400 mx-auto" />
           <h3 className="font-display text-xl font-bold text-[#1B1B3A]">
             No pilot records yet.
           </h3>

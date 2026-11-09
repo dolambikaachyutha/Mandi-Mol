@@ -13,11 +13,13 @@ import { PlannerPage } from './pages/PlannerPage';
 import { PricesPage } from './pages/PricesPage';
 import { Results } from './pages/Results';
 import { Simulator } from './pages/Simulator';
+import { TradeBoardPage } from './pages/TradeBoardPage';
 import { Trainer } from './pages/Trainer';
 import { useGame } from './store/useGame';
 
 export type AppTab =
   | 'prices'
+  | 'tradeboard'
   | 'planner'
   | 'simulator'
   | 'deals'
@@ -118,6 +120,8 @@ export default function App() {
         currentTab={currentTab}
         onNavigate={(tab) => setCurrentTab(tab as AppTab)}
         onOpenProfile={() => setIsProfileOpen(true)}
+        userRole={role}
+        onSwitchRole={(newRole) => setRole(newRole)}
       />
 
       {/* Main Content View */}
@@ -127,6 +131,14 @@ export default function App() {
           <PricesPage
             onStartPracticeWithCrop={handleStartPracticeWithCrop}
             onOpenPlannerWithCrop={handleOpenPlannerWithCrop}
+          />
+        )}
+
+        {/* Real Trade Board: Direct Farmer & Trader Exchange */}
+        {currentTab === 'tradeboard' && (
+          <TradeBoardPage
+            userRole={role}
+            onSwitchRole={(newRole) => setRole(newRole)}
           />
         )}
 

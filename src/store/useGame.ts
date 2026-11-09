@@ -22,7 +22,7 @@ import {
 import { DEFAULT_CROP } from '../lib/crops';
 import { MandiGameEngine } from '../lib/engine';
 import { fsmReducer } from '../lib/fsm';
-import { DEFAULT_LANGUAGE } from '../lib/languages';
+import { DEFAULT_LANGUAGE, LANGUAGES } from '../lib/languages';
 import { MandiNoiseLevel, mixMandiNoiseIntoAudio } from '../lib/noise';
 import { calculateScore } from '../lib/scoring';
 import { telemetry } from '../lib/telemetry';
@@ -157,7 +157,15 @@ export const useGame = create<GameStore>((set, get) => ({
     if (typeof window !== 'undefined') {
       window.localStorage.setItem(UI_LANGUAGE_STORAGE_KEY, uiLanguage);
     }
-    set({ uiLanguage });
+    let matchedLang = get().language;
+    if (uiLanguage === 'te') {
+      matchedLang = LANGUAGES.find((l) => l.code === 'telugu') || matchedLang;
+    } else if (uiLanguage === 'hi') {
+      matchedLang = LANGUAGES.find((l) => l.code === 'hindi') || matchedLang;
+    } else if (uiLanguage === 'en') {
+      matchedLang = LANGUAGES.find((l) => l.code === 'english') || matchedLang;
+    }
+    set({ uiLanguage, language: matchedLang });
   },
   setFarmerTerms: (farmerTerms) => set({ farmerTerms: farmerTerms.slice(0, 500) }),
   setTraderTerms: (traderTerms) => set({ traderTerms: traderTerms.slice(0, 500) }),

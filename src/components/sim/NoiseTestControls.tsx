@@ -1,4 +1,5 @@
 import React from 'react';
+import { Volume2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { MandiNoiseLevel } from '../../lib/noise';
 import { telemetry } from '../../lib/telemetry';
@@ -29,7 +30,7 @@ export const NoiseTestControls: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-amber-200">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-lg">📢</span>
+            <Volume2 className="w-5 h-5 text-amber-600" />
             <h4 className="font-bold text-sm text-[#1B1B3A]">
               Mandi Noise Torture Test (Procedural Ambience)
             </h4>
@@ -101,17 +102,19 @@ export const NoiseTestControls: React.FC = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => confirmNoiseTestResult(log.id, true)}
-                          className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                          className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 hover:bg-emerald-200 flex items-center gap-1"
                           title="Accurate transcription"
                         >
-                          👍 Yes
+                          <ThumbsUp className="w-3.5 h-3.5" />
+                          <span>Yes</span>
                         </button>
                         <button
                           onClick={() => confirmNoiseTestResult(log.id, false)}
-                          className="px-2 py-0.5 rounded bg-red-100 text-red-800 hover:bg-red-200"
+                          className="px-2 py-0.5 rounded bg-red-100 text-red-800 hover:bg-red-200 flex items-center gap-1"
                           title="Distorted by noise"
                         >
-                          👎 No
+                          <ThumbsDown className="w-3.5 h-3.5" />
+                          <span>No</span>
                         </button>
                       </div>
                     ) : (

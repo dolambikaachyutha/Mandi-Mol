@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
+import { Check, AlertTriangle, Award } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { useSessions } from '../../store/useSessions';
 import { RubricBars } from './RubricBars';
@@ -82,8 +83,9 @@ export const Scorecard: React.FC<ScorecardProps> = ({
       {/* Squeezed Trader Banner */}
       {isSqueezed && (
         <div className="p-3.5 bg-emerald-100 border-2 border-[#2D6A4F] rounded-xl text-center space-y-0.5 shadow-sm">
-          <p className="font-display text-lg font-bold text-[#2D6A4F]">
-            🌾 You Squeezed the Trader!
+          <p className="font-display text-lg font-bold text-[#2D6A4F] flex items-center justify-center gap-1.5">
+            <Award className="w-5 h-5" />
+            <span>You Squeezed the Trader!</span>
           </p>
           <p className="text-xs text-emerald-900">
             You captured virtually every rupee Lalaji was budgeted to concede!
@@ -126,7 +128,8 @@ export const Scorecard: React.FC<ScorecardProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
         <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
           <h5 className="font-bold text-xs uppercase tracking-wide text-emerald-900 flex items-center gap-1.5">
-            <span>✓</span> What Went Well:
+            <Check className="w-3.5 h-3.5 text-emerald-700" />
+            <span>What Went Well:</span>
           </h5>
           <ul className="text-xs text-slate-700 space-y-1 pl-1 list-disc list-inside">
             {scorecard.coachFeedback.wentWell.map((w, idx) => (
@@ -137,7 +140,8 @@ export const Scorecard: React.FC<ScorecardProps> = ({
 
         <div className="p-4 bg-red-50/70 border border-red-200 rounded-xl space-y-1.5">
           <h5 className="font-bold text-xs uppercase tracking-wide text-red-900 flex items-center gap-1.5">
-            <span>⚠️</span> Missed Opportunities:
+            <AlertTriangle className="w-3.5 h-3.5 text-red-700" />
+            <span>Missed Opportunities:</span>
           </h5>
           <ul className="text-xs text-slate-700 space-y-1 pl-1 list-disc list-inside">
             {scorecard.coachFeedback.missed.map((m, idx) => (
