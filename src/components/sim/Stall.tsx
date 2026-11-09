@@ -136,7 +136,7 @@ export const Stall: React.FC<StallProps> = ({ onShowScorecard, onExitToSetup }) 
           {isGameOver && (
             <div className="mandi-card p-5 bg-amber-50 text-center space-y-3">
               <h3 className="font-display text-2xl font-bold text-[#1B1B3A]">
-                {dealStruck ? `🎉 ${t(uiLanguage, 'dealComplete')}` : `❌ ${t(uiLanguage, 'traderWalked')}`}
+                {dealStruck ? t(uiLanguage, 'dealComplete') : t(uiLanguage, 'traderWalked')}
               </h3>
               <p className="text-xs text-slate-600">
                 {dealStruck

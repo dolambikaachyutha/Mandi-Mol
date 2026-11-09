@@ -1,4 +1,5 @@
 import React from 'react';
+import { Scale } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { t } from '../../lib/i18n';
 
@@ -11,7 +12,9 @@ export const LandingCta: React.FC<LandingCtaProps> = ({ onStart }) => {
   return (
     <section className="py-20 px-4 sm:px-6 max-w-5xl mx-auto text-center space-y-8">
       <div className="mandi-card p-8 sm:p-12 bg-amber-100 border-3 border-[#1B1B3A] shadow-[8px_8px_0px_#1B1B3A] space-y-6">
-        <span className="text-4xl">🌾</span>
+        <div className="w-12 h-12 mx-auto rounded-2xl bg-[#1B1B3A] text-[#F2B705] flex items-center justify-center border-2 border-[#1B1B3A] shadow">
+          <Scale className="w-6 h-6" />
+        </div>
         <h2 className="font-display text-3xl sm:text-5xl font-black text-[#1B1B3A] leading-tight">
           {t(uiLanguage, 'ctaTitle')}
         </h2>

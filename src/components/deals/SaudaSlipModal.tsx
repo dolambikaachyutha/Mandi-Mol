@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { X, Copy, MessageSquare, Printer, Receipt } from 'lucide-react';
 
 interface SaudaSlipProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ export const SaudaSlipModal: React.FC<SaudaSlipProps> = ({ isOpen, onClose, rece
 
   const handleCopyText = () => {
     const text = `
-🌾 MANDI SAUDA SLIP (सौदे की पर्ची) 🌾
+MANDI SAUDA SLIP (सौदे की पर्ची)
 Receipt No: ${receipt.receiptNo}
 Date: ${receipt.date}
 Mandi Yard: ${receipt.mandi}
@@ -54,7 +55,7 @@ Notice: Standard APMC mutual record for transparency.
   };
 
   const handleShareWhatsApp = () => {
-    const text = `*🌾 MANDI SAUDA SLIP (सौदे की पर्ची) 🌾*%0A*Receipt:* ${receipt.receiptNo}%0A*Date:* ${receipt.date}%0A*Mandi:* ${receipt.mandi}%0A*Crop:* ${receipt.crop}%0A*Weight:* ${receipt.quantityKg} kg (${receipt.quantityQuintal} Qtl)%0A*Rate:* ₹${receipt.ratePerKg}/kg (₹${receipt.ratePerQuintal}/Qtl)%0A*Total:* ₹${receipt.grossTotalRs.toLocaleString('en-IN')}%0A*Payment:* ${receipt.paymentMode}%0A*Party:* ${receipt.party}%0A%0A_Generated via Mandi Mol (https://mandimol.vercel.app)_`;
+    const text = `*MANDI SAUDA SLIP (सौदे की पर्ची)*%0A*Receipt:* ${receipt.receiptNo}%0A*Date:* ${receipt.date}%0A*Mandi:* ${receipt.mandi}%0A*Crop:* ${receipt.crop}%0A*Weight:* ${receipt.quantityKg} kg (${receipt.quantityQuintal} Qtl)%0A*Rate:* ₹${receipt.ratePerKg}/kg (₹${receipt.ratePerQuintal}/Qtl)%0A*Total:* ₹${receipt.grossTotalRs.toLocaleString('en-IN')}%0A*Payment:* ${receipt.paymentMode}%0A*Party:* ${receipt.party}%0A%0A_Generated via Mandi Mol (https://mandimol.vercel.app)_`;
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 
@@ -64,10 +65,10 @@ Notice: Standard APMC mutual record for transparency.
         {/* Close Button (Hidden on Print) */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-2xl font-bold text-[#1B1B3A] hover:text-[#D62828] focus:outline-none print:hidden"
+          className="absolute top-4 right-4 text-stone-700 hover:text-[#D62828] focus:outline-none print:hidden p-1"
           aria-label="Close"
         >
-          ✕
+          <X className="w-5 h-5" />
         </button>
 
         {/* Printable Slip Container */}
@@ -75,7 +76,7 @@ Notice: Standard APMC mutual record for transparency.
           {/* Header */}
           <div className="text-center border-b-2 border-[#1B1B3A] pb-3 mb-4">
             <div className="flex items-center justify-center gap-2 mb-1">
-              <span className="text-2xl">🌶️</span>
+              <Receipt className="w-6 h-6 text-[#D62828]" />
               <h2 className="text-2xl font-black font-display tracking-tight text-[#1B1B3A]">
                 MANDI SAUDA SLIP
               </h2>
@@ -157,7 +158,7 @@ Notice: Standard APMC mutual record for transparency.
             onClick={handleCopyText}
             className="py-2.5 px-3 rounded-xl border-2 border-[#1B1B3A] bg-white font-bold text-xs text-[#1B1B3A] hover:bg-stone-100 transition-colors flex items-center justify-center gap-1.5"
           >
-            <span>📋</span>
+            <Copy className="w-4 h-4" />
             <span>Copy Text</span>
           </button>
 
@@ -166,7 +167,7 @@ Notice: Standard APMC mutual record for transparency.
             onClick={handleShareWhatsApp}
             className="py-2.5 px-3 rounded-xl border-2 border-emerald-700 bg-emerald-600 font-bold text-xs text-white hover:bg-emerald-700 transition-colors flex items-center justify-center gap-1.5"
           >
-            <span>💬</span>
+            <MessageSquare className="w-4 h-4" />
             <span>WhatsApp</span>
           </button>
 
@@ -175,7 +176,7 @@ Notice: Standard APMC mutual record for transparency.
             onClick={handlePrint}
             className="py-2.5 px-3 rounded-xl border-2 border-[#1B1B3A] bg-[#1B1B3A] font-bold text-xs text-[#F2B705] hover:bg-[#2A2A5A] transition-colors flex items-center justify-center gap-1.5"
           >
-            <span>🖨️</span>
+            <Printer className="w-4 h-4" />
             <span>Print Slip</span>
           </button>
         </div>

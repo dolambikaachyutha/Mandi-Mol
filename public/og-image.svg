@@ -42,25 +42,25 @@
   <g transform="translate(150, 340)">
     <!-- 1. Live Prices -->
     <rect x="0" y="0" width="200" height="120" fill="#24244E" stroke="#F2B705" stroke-width="2" rx="12"/>
-    <text x="100" y="45" font-size="32" text-anchor="middle">📊</text>
+    <text x="100" y="45" font-family="'DM Mono', monospace" font-size="20" font-weight="bold" fill="#F2B705" text-anchor="middle">LIVE 01</text>
     <text x="100" y="80" font-family="'Mukta', sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle">Aaj Ka Bhav</text>
     <text x="100" y="102" font-family="'Mukta', sans-serif" font-size="13" fill="#CAD2C5" text-anchor="middle">Live Agmarknet Rates</text>
 
     <!-- 2. Sell Planner -->
     <rect x="230" y="0" width="200" height="120" fill="#24244E" stroke="#F2B705" stroke-width="2" rx="12"/>
-    <text x="330" y="45" font-size="32" text-anchor="middle">🗺️</text>
+    <text x="330" y="45" font-family="'DM Mono', monospace" font-size="20" font-weight="bold" fill="#F2B705" text-anchor="middle">PLAN 02</text>
     <text x="330" y="80" font-family="'Mukta', sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle">Sell Planner</text>
     <text x="330" y="102" font-family="'Mukta', sans-serif" font-size="13" fill="#CAD2C5" text-anchor="middle">Net-in-Hand per Mandi</text>
 
     <!-- 3. Bargain Practice -->
     <rect x="460" y="0" width="200" height="120" fill="#24244E" stroke="#F2B705" stroke-width="2" rx="12"/>
-    <text x="560" y="45" font-size="32" text-anchor="middle">🎙️</text>
+    <text x="560" y="45" font-family="'DM Mono', monospace" font-size="20" font-weight="bold" fill="#F2B705" text-anchor="middle">VOICE 03</text>
     <text x="560" y="80" font-family="'Mukta', sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle">Mol-Bhav Practice</text>
     <text x="560" y="102" font-family="'Mukta', sans-serif" font-size="13" fill="#CAD2C5" text-anchor="middle">Gnani AI Voice Agent</text>
 
     <!-- 4. Sauda Ledger -->
     <rect x="690" y="0" width="200" height="120" fill="#24244E" stroke="#F2B705" stroke-width="2" rx="12"/>
-    <text x="790" y="45" font-size="32" text-anchor="middle">🧾</text>
+    <text x="790" y="45" font-family="'DM Mono', monospace" font-size="20" font-weight="bold" fill="#F2B705" text-anchor="middle">SLIP 04</text>
     <text x="790" y="80" font-family="'Mukta', sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle">Sauda Ledger</text>
     <text x="790" y="102" font-family="'Mukta', sans-serif" font-size="13" fill="#CAD2C5" text-anchor="middle">Dispute-Proof Receipts</text>
   </g>

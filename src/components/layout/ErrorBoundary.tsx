@@ -1,4 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
@@ -28,7 +29,9 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen bg-[#F6EBD3] flex items-center justify-center p-6 text-[#1B1B3A]">
           <div className="max-w-md w-full bg-white border-[3px] border-[#1B1B3A] rounded-2xl p-6 shadow-2xl text-center">
-            <span className="text-4xl block mb-2">🌶️⚠️</span>
+            <div className="flex justify-center mb-2">
+              <AlertTriangle className="w-10 h-10 text-amber-500" />
+            </div>
             <h2 className="text-xl font-black font-display text-[#1B1B3A] mb-1">
               कुछ गड़बड़ हुई (Display Recovery)
             </h2>
@@ -46,9 +49,10 @@ export class ErrorBoundary extends Component<Props, State> {
                 this.setState({ hasError: false, error: null });
                 window.location.reload();
               }}
-              className="w-full py-2.5 px-4 bg-[#1B1B3A] text-[#F2B705] font-bold text-xs rounded-xl hover:bg-[#2A2A5A] transition-colors shadow"
+              className="w-full py-2.5 px-4 bg-[#1B1B3A] text-[#F2B705] font-bold text-xs rounded-xl hover:bg-[#2A2A5A] transition-colors shadow inline-flex items-center justify-center gap-2"
             >
-              🔄 Refresh Mandi Mol
+              <RefreshCw className="w-4 h-4" />
+              Refresh Mandi Mol
             </button>
           </div>
         </div>

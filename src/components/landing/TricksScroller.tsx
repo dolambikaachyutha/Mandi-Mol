@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Lightbulb } from 'lucide-react';
 import { TRICK_LIST } from '../../lib/tricks';
 import { useGame } from '../../store/useGame';
 import { t } from '../../lib/i18n';
@@ -28,11 +29,10 @@ export const TricksScroller: React.FC = () => {
             <button
               key={t.id}
               onClick={() => setSelectedIdx(idx)}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
-                selectedIdx === idx
+              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${selectedIdx === idx
                   ? 'bg-[#1B1B3A] text-amber-300 shadow-sm'
                   : 'text-slate-700 hover:text-[#1B1B3A]'
-              }`}
+                }`}
             >
               {t.icon} {t.name.split(' ')[0]}
             </button>
@@ -48,11 +48,10 @@ export const TricksScroller: React.FC = () => {
             <div
               key={trick.id}
               onClick={() => setSelectedIdx(idx)}
-              className={`mandi-card p-6 bg-[#FFFDF8] border-3 transition-all cursor-pointer flex flex-col justify-between ${
-                isSelected
+              className={`mandi-card p-6 bg-[#FFFDF8] border-3 transition-all cursor-pointer flex flex-col justify-between ${isSelected
                   ? 'border-[#D62828] shadow-[6px_6px_0px_#D62828] ring-2 ring-red-200'
                   : 'border-[#1B1B3A] hover:border-[#D62828] shadow-[4px_4px_0px_#1B1B3A]'
-              }`}
+                }`}
             >
               <div>
                 {/* Header */}
@@ -89,8 +88,9 @@ export const TricksScroller: React.FC = () => {
 
               {/* Counter Tip */}
               <div className="mt-4 pt-3 border-t border-amber-200 bg-emerald-50/80 p-3 rounded-xl border border-emerald-200">
-                <span className="text-[10px] font-bold text-[#2D6A4F] uppercase tracking-wide block mb-1">
-                  💡 {t(uiLanguage, 'counterTip')}:
+                <span className="text-[10px] font-bold text-[#2D6A4F] uppercase tracking-wide flex items-center gap-1 mb-1">
+                  <Lightbulb className="w-3.5 h-3.5" />
+                  <span>{t(uiLanguage, 'counterTip')}:</span>
                 </span>
                 <p className="text-xs text-slate-800 font-medium">
                   {trick.counterTip}

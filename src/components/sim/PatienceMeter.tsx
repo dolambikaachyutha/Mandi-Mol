@@ -1,4 +1,5 @@
 import React from 'react';
+import { Flame } from 'lucide-react';
 
 interface PatienceMeterProps {
   patience: number; // 0 to 5
@@ -21,16 +22,16 @@ export const PatienceMeter: React.FC<PatienceMeterProps> = ({
             return (
               <span
                 key={level}
-                className={`text-lg transition-all duration-300 transform ${
-                  isActive
-                    ? 'opacity-100 scale-105 filter drop-shadow'
-                    : 'opacity-20 grayscale scale-90'
-                }`}
+                className="transition-all duration-300 transform"
                 title={`Patience ${patience}/5`}
-                role="img"
-                aria-label={isActive ? 'Active chilli' : 'Dim chilli'}
               >
-                🌶️
+                <Flame
+                  className={`w-4 h-4 ${
+                    isActive
+                      ? 'text-[#D62828] fill-[#D62828] scale-110 drop-shadow'
+                      : 'text-stone-300 scale-90'
+                  }`}
+                />
               </span>
             );
           })}

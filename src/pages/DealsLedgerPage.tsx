@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FileText, Building, Plus, Receipt, Download, TrendingDown, X, PlusCircle } from 'lucide-react';
 import { fetchFpoAnalytics, fetchUserDeals, recordRealDeal } from '../lib/api';
 import { CROPS_LIST } from '../lib/crops';
 import { SaudaSlipModal } from '../components/deals/SaudaSlipModal';
@@ -145,20 +146,22 @@ export const DealsLedgerPage: React.FC<DealsLedgerPageProps> = ({ userId = 'farm
           <button
             type="button"
             onClick={() => setActiveTab('ledger')}
-            className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 ${
               activeTab === 'ledger' ? 'bg-[#F2B705] text-[#1B1B3A]' : 'text-stone-300 hover:text-white'
             }`}
           >
-            📜 My Ledger
+            <FileText className="w-3.5 h-3.5" />
+            <span>My Ledger</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('fpo')}
-            className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 ${
               activeTab === 'fpo' ? 'bg-[#F2B705] text-[#1B1B3A]' : 'text-stone-300 hover:text-white'
             }`}
           >
-            🏢 FPO Dashboard (5+ Users)
+            <Building className="w-3.5 h-3.5" />
+            <span>FPO Dashboard (5+ Users)</span>
           </button>
         </div>
       </div>
@@ -227,7 +230,7 @@ export const DealsLedgerPage: React.FC<DealsLedgerPageProps> = ({ userId = 'farm
               onClick={() => setIsAddModalOpen(true)}
               className="px-4 py-2 rounded-xl bg-[#D62828] text-white font-bold text-xs hover:bg-red-700 transition-colors shadow flex items-center gap-1.5"
             >
-              <span>➕</span>
+              <Plus className="w-4 h-4" />
               <span>नया सौदा दर्ज करें (Log Real Deal)</span>
             </button>
           </div>
@@ -240,7 +243,7 @@ export const DealsLedgerPage: React.FC<DealsLedgerPageProps> = ({ userId = 'farm
               </div>
             ) : deals.length === 0 ? (
               <div className="p-12 text-center">
-                <span className="text-4xl block mb-2">📜</span>
+                <Receipt className="w-10 h-10 text-stone-400 mx-auto mb-2" />
                 <h3 className="text-base font-bold text-[#1B1B3A] mb-1">No Real Deals Logged Yet</h3>
                 <p className="text-xs text-stone-500 max-w-sm mx-auto mb-4">
                   Whenever you sell in the Mandi, log the rate and weight to verify your savings vs Agmarknet benchmarks and get an instant dispute-proof Sauda Slip.
@@ -302,9 +305,10 @@ export const DealsLedgerPage: React.FC<DealsLedgerPageProps> = ({ userId = 'farm
                           <button
                             type="button"
                             onClick={() => handleOpenExistingReceipt(d)}
-                            className="px-2.5 py-1 rounded-lg border border-[#1B1B3A] bg-stone-100 hover:bg-[#1B1B3A] hover:text-[#F2B705] transition-colors font-bold text-[11px]"
+                            className="px-2.5 py-1 rounded-lg border border-[#1B1B3A] bg-stone-100 hover:bg-[#1B1B3A] hover:text-[#F2B705] transition-colors font-bold text-[11px] inline-flex items-center gap-1"
                           >
-                            🧾 Slip
+                            <FileText className="w-3 h-3" />
+                            <span>Slip</span>
                           </button>
                         </td>
                       </tr>
@@ -340,7 +344,7 @@ export const DealsLedgerPage: React.FC<DealsLedgerPageProps> = ({ userId = 'farm
                 download="mandi_mol_fpo_insights.csv"
                 className="px-4 py-2 rounded-xl bg-[#1B1B3A] text-[#F2B705] font-bold text-xs hover:bg-[#2A2A5A] transition-colors flex items-center justify-center gap-1.5 shrink-0"
               >
-                <span>📥</span>
+                <Download className="w-4 h-4" />
                 <span>Download CSV Export</span>
               </a>
             </div>
@@ -387,9 +391,12 @@ export const DealsLedgerPage: React.FC<DealsLedgerPageProps> = ({ userId = 'farm
 
                 {/* Common Mandi Tricks & Failure Rates */}
                 <div>
-                  <h3 className="text-sm font-black text-[#1B1B3A] mb-2">
-                    📉 Mandi Trick Vulnerability Aggregates (किस चाल में किसान सबसे ज्यादा झुकते हैं?)
-                  </h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingDown className="w-4 h-4 text-red-600" />
+                    <h3 className="text-sm font-black text-[#1B1B3A]">
+                      Mandi Trick Vulnerability Aggregates (किस चाल में किसान सबसे ज्यादा झुकते हैं?)
+                    </h3>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     {fpoData?.commonMandiTricksAggregate?.map((t: any, idx: number) => (
                       <div key={idx} className="p-3 bg-stone-50 rounded-xl border border-stone-200 text-xs">
@@ -416,13 +423,17 @@ export const DealsLedgerPage: React.FC<DealsLedgerPageProps> = ({ userId = 'farm
           <div className="bg-[#FAF4E6] border-[3px] border-[#1B1B3A] rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsAddModalOpen(false)}
-              className="absolute top-4 right-4 text-2xl font-bold text-[#1B1B3A] hover:text-[#D62828]"
+              className="absolute top-4 right-4 text-stone-700 hover:text-[#D62828] p-1"
+              aria-label="Close"
             >
-              ✕
+              <X className="w-5 h-5" />
             </button>
-            <h3 className="text-xl font-black font-display text-[#1B1B3A] mb-1">
-              📝 नया सौदा दर्ज करें (Log Real Mandi Deal)
-            </h3>
+            <div className="flex items-center gap-2 mb-1">
+              <PlusCircle className="w-5 h-5 text-amber-600" />
+              <h3 className="text-xl font-black font-display text-[#1B1B3A]">
+                नया सौदा दर्ज करें (Log Real Mandi Deal)
+              </h3>
+            </div>
             <p className="text-xs text-stone-600 mb-4">
               Enter agreed sale details. We will automatically fetch that day's Agmarknet modal rate to calculate your true rupee edge.
             </p>

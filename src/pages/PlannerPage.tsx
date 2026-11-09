@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Sliders, Award, ShieldAlert, AlertTriangle, ShieldCheck, Mic, Star } from 'lucide-react';
 import { fetchSellPlan } from '../lib/api';
 import { CROPS_LIST } from '../lib/crops';
 import type { SellPlanResponse } from '../types';
@@ -143,9 +144,12 @@ export const PlannerPage: React.FC<PlannerPageProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Left Column: Form Inputs */}
         <div className="bg-white border-2 border-[#1B1B3A] rounded-2xl p-5 shadow-md space-y-4">
-          <h2 className="text-base font-black text-[#1B1B3A] border-b pb-2">
-            ⚙️ Trip Parameters (अपनी यात्रा विवरण)
-          </h2>
+          <div className="flex items-center gap-2 border-b pb-2">
+            <Sliders className="w-4 h-4 text-[#D62828]" />
+            <h2 className="text-base font-black text-[#1B1B3A]">
+              Trip Parameters (अपनी यात्रा विवरण)
+            </h2>
+          </div>
 
           {/* Crop Selector */}
           <div>
@@ -260,7 +264,7 @@ export const PlannerPage: React.FC<PlannerPageProps> = ({
                 {/* Best Market */}
                 <div className="bg-[#FAF4E6] border-2 border-[#1B1B3A] p-4 rounded-2xl shadow">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xl">🏆</span>
+                    <Award className="w-5 h-5 text-amber-600" />
                     <span className="text-xs font-bold uppercase text-[#D62828] tracking-wider">
                       Best Mandi Today (सर्वोत्तम मंडी)
                     </span>
@@ -274,7 +278,7 @@ export const PlannerPage: React.FC<PlannerPageProps> = ({
                 {/* Recommended Floor */}
                 <div className="bg-[#1B1B3A] text-white p-4 rounded-2xl shadow border-2 border-[#1B1B3A]">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xl">🛑</span>
+                    <ShieldAlert className="w-5 h-5 text-amber-300" />
                     <span className="text-xs font-bold uppercase text-amber-300 tracking-wider">
                       Do Not Sell Below Floor (न्यूनतम तल)
                     </span>
@@ -319,7 +323,7 @@ export const PlannerPage: React.FC<PlannerPageProps> = ({
                         >
                           <td className="py-2.5 px-2.5">
                             <div className="flex items-center gap-1.5">
-                              {m.isBestMarket && <span className="text-xs">⭐</span>}
+                              {m.isBestMarket && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
                               <span>{m.market}</span>
                             </div>
                             <span className="text-[10px] text-stone-500 font-normal">~{m.distanceKm} km away</span>
@@ -344,7 +348,7 @@ export const PlannerPage: React.FC<PlannerPageProps> = ({
               {/* Top 3 Likely Tricks & Counter-measures */}
               <div className="bg-white border-2 border-[#1B1B3A] rounded-2xl p-5 shadow">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xl">⚠️</span>
+                  <AlertTriangle className="w-5 h-5 text-amber-600" />
                   <h3 className="text-sm font-black text-[#1B1B3A]">
                     इस मंडी में संभावित 3 चालें (Top 3 Likely Tricks at {planResult.bestMarketToday})
                   </h3>
@@ -360,9 +364,9 @@ export const PlannerPage: React.FC<PlannerPageProps> = ({
                         <span className="font-bold text-[#1B1B3A]">{t.name}</span>
                       </div>
                       <p className="text-stone-600 mb-1.5 pl-7">{t.description}</p>
-                      <div className="pl-7 text-emerald-800 font-bold flex items-start gap-1">
-                        <span>🛡️ Counter:</span>
-                        <span>{t.counterMeasure}</span>
+                      <div className="pl-7 text-emerald-800 font-bold flex items-start gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                        <span>Counter: {t.counterMeasure}</span>
                       </div>
                     </div>
                   ))}
@@ -389,9 +393,10 @@ export const PlannerPage: React.FC<PlannerPageProps> = ({
                       planResult.recommendedFloorPricePerKg
                     )
                   }
-                  className="px-5 py-2.5 bg-[#1B1B3A] text-[#F2B705] font-bold text-xs rounded-xl hover:bg-[#2A2A5A] transition-colors shrink-0 shadow"
+                  className="px-5 py-2.5 bg-[#1B1B3A] text-[#F2B705] font-bold text-xs rounded-xl hover:bg-[#2A2A5A] transition-colors shrink-0 shadow flex items-center gap-1.5"
                 >
-                  🎙️ Start Practice Simulation
+                  <Mic className="w-4 h-4" />
+                  <span>Start Practice Simulation</span>
                 </button>
               </div>
             </>

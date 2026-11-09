@@ -1,4 +1,5 @@
 import React from 'react';
+import { Scale } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { t } from '../../lib/i18n';
 
@@ -17,7 +18,7 @@ export const Hero: React.FC<HeroProps> = ({ onStart }) => {
         <div className="lg:col-span-7 space-y-6">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 border-2 border-[#1B1B3A] rounded-full text-xs font-mono font-bold text-[#1B1B3A] shadow-[2px_2px_0px_#1B1B3A]">
-            <span>🌶️</span>
+            <Scale className="w-3.5 h-3.5 text-[#D62828]" />
             <span>{t(uiLanguage, 'heroBadge')}</span>
           </div>
 

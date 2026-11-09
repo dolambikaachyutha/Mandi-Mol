@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { User, Sprout, Briefcase, ShieldCheck, Trash2, X, Check } from 'lucide-react';
 import { deleteUserData } from '../../lib/api';
 
 interface ProfileModalProps {
@@ -53,14 +54,16 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       <div className="bg-[#F6EBD3] border-[3px] border-[#1B1B3A] rounded-2xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-2xl font-bold text-[#1B1B3A] hover:text-[#D62828] focus:outline-none"
+          className="absolute top-4 right-4 text-stone-700 hover:text-[#D62828] focus:outline-none p-1"
           aria-label="Close Profile"
         >
-          ✕
+          <X className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-3xl">👤</span>
+          <div className="w-10 h-10 rounded-xl bg-amber-200 border-2 border-[#1B1B3A] flex items-center justify-center shrink-0">
+            <User className="w-6 h-6 text-[#1B1B3A]" />
+          </div>
           <div>
             <h2 className="text-2xl font-black font-display text-[#1B1B3A]">Mandi Mol Profile</h2>
             <p className="text-xs text-[#1B1B3A]/70 font-mono">ID: {userId.slice(0, 16)}...</p>
@@ -68,8 +71,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
 
         {deleteSuccessMsg ? (
-          <div className="p-4 bg-emerald-100 border-2 border-emerald-600 rounded-xl text-emerald-900 font-bold text-sm mb-4">
-            ✓ {deleteSuccessMsg}
+          <div className="p-4 bg-emerald-100 border-2 border-emerald-600 rounded-xl text-emerald-900 font-bold text-sm mb-4 flex items-center gap-2">
+            <Check className="w-5 h-5 text-emerald-700 shrink-0" />
+            <span>{deleteSuccessMsg}</span>
           </div>
         ) : null}
 
@@ -86,7 +90,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   : 'bg-white text-[#1B1B3A] border-stone-300 hover:border-[#1B1B3A]'
               }`}
             >
-              <span>🌾</span>
+              <Sprout className="w-4 h-4 text-emerald-600" />
               <span>Kisan (Farmer)</span>
             </button>
             <button
@@ -98,7 +102,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   : 'bg-white text-[#1B1B3A] border-stone-300 hover:border-[#1B1B3A]'
               }`}
             >
-              <span>💼</span>
+              <Briefcase className="w-4 h-4 text-stone-600" />
               <span>Vyapari (Trader)</span>
             </button>
           </div>
@@ -119,7 +123,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         {/* DPDP Compliance & Right to Erasure */}
         <div className="mb-6 p-4 bg-amber-50 rounded-xl border-2 border-amber-600/50">
           <div className="flex items-center gap-2 text-xs font-bold text-amber-900 mb-1">
-            <span>🛡️</span>
+            <ShieldCheck className="w-4 h-4 text-amber-800 shrink-0" />
             <span>Digital Personal Data Protection (DPDP) Act 2023</span>
           </div>
           <p className="text-xs text-amber-950/80 leading-relaxed">
@@ -135,7 +139,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             disabled={isDeleting}
             className="w-full py-2.5 px-4 rounded-xl border-2 border-[#D62828] bg-red-50 text-[#D62828] font-bold text-sm hover:bg-[#D62828] hover:text-white transition-colors flex items-center justify-center gap-2"
           >
-            <span>🗑️</span>
+            <Trash2 className="w-4 h-4" />
             <span>{isDeleting ? 'Erasing All Data...' : 'Delete My Data (Right to Erasure)'}</span>
           </button>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { TrendingUp, Compass, Mic, FileText, User, Scale } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { t, UI_LANGUAGES } from '../../lib/i18n';
 import { StatusChips } from './StatusChips';
@@ -20,9 +21,9 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenPr
           onClick={() => onNavigate('prices')}
           className="flex items-center gap-2 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B1B3A] rounded-lg"
         >
-          <span className="text-2xl" role="img" aria-label="Mandi Chilli">
-            🌶️
-          </span>
+          <div className="w-9 h-9 rounded-xl bg-[#1B1B3A] text-[#F2B705] flex items-center justify-center border-2 border-[#1B1B3A] group-hover:bg-[#D62828] group-hover:text-white transition-colors">
+            <Scale className="w-5 h-5" />
+          </div>
           <div className="flex flex-col">
             <span className="font-display text-xl sm:text-2xl font-bold tracking-tight text-[#1B1B3A] group-hover:text-[#D62828] transition-colors whitespace-nowrap shrink-0 leading-tight">
               Mandi Mol
@@ -37,35 +38,39 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenPr
         <nav className="hidden md:flex items-center gap-5 text-xs lg:text-sm font-bold text-[#1B1B3A]">
           <button
             onClick={() => onNavigate('prices')}
-            className={`transition-colors whitespace-nowrap shrink-0 hover:text-[#D62828] ${
+            className={`transition-colors whitespace-nowrap shrink-0 hover:text-[#D62828] flex items-center gap-1.5 ${
               currentTab === 'prices' ? 'text-[#D62828] underline underline-offset-4' : ''
             }`}
           >
-            📊 {uiLanguage === 'hi' ? 'आज का भाव' : 'Live Prices'}
+            <TrendingUp className="w-4 h-4" />
+            {uiLanguage === 'hi' ? 'आज का भाव' : 'Live Prices'}
           </button>
           <button
             onClick={() => onNavigate('planner')}
-            className={`transition-colors whitespace-nowrap shrink-0 hover:text-[#D62828] ${
+            className={`transition-colors whitespace-nowrap shrink-0 hover:text-[#D62828] flex items-center gap-1.5 ${
               currentTab === 'planner' ? 'text-[#D62828] underline underline-offset-4' : ''
             }`}
           >
-            🗺️ {uiLanguage === 'hi' ? 'प्लानर' : 'Sell Planner'}
+            <Compass className="w-4 h-4" />
+            {uiLanguage === 'hi' ? 'प्लानर' : 'Sell Planner'}
           </button>
           <button
             onClick={() => onNavigate('simulator')}
-            className={`transition-colors whitespace-nowrap shrink-0 hover:text-[#D62828] ${
+            className={`transition-colors whitespace-nowrap shrink-0 hover:text-[#D62828] flex items-center gap-1.5 ${
               currentTab === 'simulator' ? 'text-[#D62828] underline underline-offset-4' : ''
             }`}
           >
-            🎙️ {uiLanguage === 'hi' ? 'मोल-भाव प्रैक्टिस' : 'Bargain Practice'}
+            <Mic className="w-4 h-4" />
+            {uiLanguage === 'hi' ? 'मोल-भाव प्रैक्टिस' : 'Bargain Practice'}
           </button>
           <button
             onClick={() => onNavigate('deals')}
-            className={`transition-colors whitespace-nowrap shrink-0 hover:text-[#D62828] ${
+            className={`transition-colors whitespace-nowrap shrink-0 hover:text-[#D62828] flex items-center gap-1.5 ${
               currentTab === 'deals' ? 'text-[#D62828] underline underline-offset-4' : ''
             }`}
           >
-            📜 {uiLanguage === 'hi' ? 'सौदा बही' : 'My Deals & Slip'}
+            <FileText className="w-4 h-4" />
+            {uiLanguage === 'hi' ? 'सौदा बही' : 'My Deals & Slip'}
           </button>
           <button
             onClick={() => onNavigate('architecture')}
@@ -102,7 +107,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onNavigate, onOpenPr
               className="p-1.5 sm:px-2.5 sm:py-1 rounded-lg border-2 border-[#1B1B3A] bg-white text-xs font-bold text-[#1B1B3A] hover:bg-amber-100 flex items-center gap-1"
               title="Profile, Role & DPDP Privacy Settings"
             >
-              <span>👤</span>
+              <User className="w-4 h-4" />
               <span className="hidden sm:inline">Profile</span>
             </button>
           )}

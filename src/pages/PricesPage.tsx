@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { MapPin, Mic, Square, Volume2, Bell, Lightbulb, Compass, X, Check, MessageSquare } from 'lucide-react';
 import { createPriceAlert, fetchMandiPrices, queryMandiVoice } from '../lib/api';
 import { audioManager } from '../lib/audio';
 import { convertToPrismaWav } from '../lib/wav';
 import { CROPS_LIST } from '../lib/crops';
+import { CropIcon } from '../components/common/CropIcon';
 import type { MandiPriceItem, NearbyMandiItem, PriceAlert } from '../types';
 
 interface PricesPageProps {
@@ -224,7 +226,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
 
         {/* Location Dropdown */}
         <div className="flex items-center gap-2 bg-[#2A2A5A] p-2 rounded-xl border border-white/20">
-          <span className="text-xl">📍</span>
+          <MapPin className="w-5 h-5 text-amber-300 shrink-0" />
           <div>
             <label className="text-[10px] text-amber-200 block uppercase font-bold">Selected APMC Mandi</label>
             <select
@@ -258,7 +260,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
             title="Press and speak your crop question"
             aria-label="Voice Search"
           >
-            {isRecording ? '⏹️' : '🎙️'}
+            {isRecording ? <Square className="w-7 h-7" /> : <Mic className="w-7 h-7" />}
           </button>
 
           <div className="flex-1 w-full text-center md:text-left">
@@ -292,7 +294,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
         {/* Spoken Answer Result Card */}
         {voiceAnswer && (
           <div className="mt-4 p-4 bg-amber-50 border-2 border-[#F2B705] rounded-xl flex items-start gap-3 animate-fade-in">
-            <span className="text-2xl">🔊</span>
+            <Volume2 className="w-6 h-6 text-emerald-600 shrink-0" />
             <div className="flex-1">
               <p className="text-xs font-bold text-[#D62828] uppercase tracking-wider">
                 Mandi Mol Verified Answer
@@ -323,7 +325,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
             onClick={() => setIsAlertModalOpen(true)}
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-[#1B1B3A] bg-white text-xs font-bold text-[#1B1B3A] hover:bg-amber-100 transition-colors"
           >
-            <span>🔔</span>
+            <Bell className="w-4 h-4" />
             <span>Set Price Alert</span>
           </button>
         </div>
@@ -343,7 +345,9 @@ export const PricesPage: React.FC<PricesPageProps> = ({
                   {/* Header: Crop name & Variety */}
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">{cropMeta.icon}</span>
+                      <div className="w-9 h-9 rounded-xl bg-amber-50 border border-stone-200 flex items-center justify-center shrink-0">
+                        <CropIcon cropId={cropMeta.id} className="w-5 h-5" />
+                      </div>
                       <div>
                         <h3 className="font-black text-lg text-[#1B1B3A] leading-tight">
                           {item.commodity}
@@ -376,7 +380,7 @@ export const PricesPage: React.FC<PricesPageProps> = ({
                   {/* Nearby Mandi Delta Banner */}
                   {diffStatement && (
                     <div className="mb-3 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-semibold flex items-center gap-1.5">
-                      <span>💡</span>
+                      <Lightbulb className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{diffStatement}</span>
                     </div>
                   )}
@@ -411,16 +415,18 @@ export const PricesPage: React.FC<PricesPageProps> = ({
                   <button
                     type="button"
                     onClick={() => onOpenPlannerWithCrop && onOpenPlannerWithCrop(cropMeta.id)}
-                    className="py-2 px-2 text-xs font-bold rounded-xl border-2 border-[#1B1B3A] bg-stone-100 hover:bg-stone-200 text-[#1B1B3A] text-center transition-colors"
+                    className="py-2 px-2 text-xs font-bold rounded-xl border-2 border-[#1B1B3A] bg-stone-100 hover:bg-stone-200 text-[#1B1B3A] text-center transition-colors flex items-center justify-center gap-1.5"
                   >
-                    🗺️ Sell Plan
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>Sell Plan</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => onStartPracticeWithCrop && onStartPracticeWithCrop(cropMeta.id, item.modalPricePerKg)}
-                    className="py-2 px-2 text-xs font-bold rounded-xl bg-[#1B1B3A] text-[#F2B705] hover:bg-[#2A2A5A] text-center transition-colors"
+                    className="py-2 px-2 text-xs font-bold rounded-xl bg-[#1B1B3A] text-[#F2B705] hover:bg-[#2A2A5A] text-center transition-colors flex items-center justify-center gap-1.5"
                   >
-                    🎙️ Practice
+                    <Mic className="w-3.5 h-3.5" />
+                    <span>Practice</span>
                   </button>
                 </div>
               </div>
@@ -486,20 +492,25 @@ export const PricesPage: React.FC<PricesPageProps> = ({
           <div className="bg-[#F6EBD3] border-[3px] border-[#1B1B3A] rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
             <button
               onClick={() => setIsAlertModalOpen(false)}
-              className="absolute top-4 right-4 text-2xl font-bold text-[#1B1B3A] hover:text-[#D62828]"
+              className="absolute top-4 right-4 text-stone-700 hover:text-[#D62828] p-1"
+              aria-label="Close"
             >
-              ✕
+              <X className="w-5 h-5" />
             </button>
-            <h3 className="text-xl font-black font-display text-[#1B1B3A] mb-1">
-              🔔 Set Price Alert
-            </h3>
+            <div className="flex items-center gap-2 mb-1">
+              <Bell className="w-5 h-5 text-amber-600" />
+              <h3 className="text-xl font-black font-display text-[#1B1B3A]">
+                Set Price Alert
+              </h3>
+            </div>
             <p className="text-xs text-stone-600 mb-4">
               Get notified immediately on WhatsApp or Browser Push when the modal price crosses your target.
             </p>
 
             {alertStatusMessage ? (
-              <div className="p-3 bg-emerald-100 border border-emerald-500 rounded-xl text-emerald-900 font-bold text-xs mb-3">
-                ✓ {alertStatusMessage}
+              <div className="p-3 bg-emerald-100 border border-emerald-500 rounded-xl text-emerald-900 font-bold text-xs mb-3 flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-emerald-700" />
+                <span>{alertStatusMessage}</span>
               </div>
             ) : null}
 
@@ -536,24 +547,26 @@ export const PricesPage: React.FC<PricesPageProps> = ({
                   <button
                     type="button"
                     onClick={() => setAlertChannel('push')}
-                    className={`p-2 rounded-xl border-2 font-bold text-xs ${
+                    className={`p-2 rounded-xl border-2 font-bold text-xs flex items-center justify-center gap-1.5 ${
                       alertChannel === 'push'
                         ? 'bg-[#1B1B3A] text-[#F2B705] border-[#1B1B3A]'
                         : 'bg-white text-[#1B1B3A] border-stone-300'
                     }`}
                   >
-                    🔔 Browser Push
+                    <Bell className="w-4 h-4" />
+                    <span>Browser Push</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setAlertChannel('whatsapp')}
-                    className={`p-2 rounded-xl border-2 font-bold text-xs ${
+                    className={`p-2 rounded-xl border-2 font-bold text-xs flex items-center justify-center gap-1.5 ${
                       alertChannel === 'whatsapp'
                         ? 'bg-[#1B1B3A] text-[#F2B705] border-[#1B1B3A]'
                         : 'bg-white text-[#1B1B3A] border-stone-300'
                     }`}
                   >
-                    💬 WhatsApp
+                    <MessageSquare className="w-4 h-4" />
+                    <span>WhatsApp</span>
                   </button>
                 </div>
               </div>

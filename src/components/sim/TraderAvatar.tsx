@@ -30,9 +30,8 @@ export const TraderAvatar: React.FC<TraderAvatarProps> = ({
 
       {/* Steam puff if irritated */}
       {mood === 'irritated' && (
-        <div className="absolute -top-4 right-6 flex gap-1 animate-bounce">
-          <span className="text-xl">💨</span>
-          <span className="text-base text-red-500 font-bold">💢</span>
+        <div className="absolute -top-4 right-6 flex items-center gap-1 bg-red-100 border border-red-500 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-bold animate-bounce shadow">
+          <span>Tough Stance</span>
         </div>
       )}
 

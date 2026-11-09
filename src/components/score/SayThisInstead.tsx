@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Mic, Check, Volume2 } from 'lucide-react';
 import { CoachBetterLine } from '../../types';
 import { synthesizeSpeech } from '../../lib/api';
 import { audioManager } from '../../lib/audio';
@@ -39,7 +40,7 @@ export const SayThisInstead: React.FC<SayThisInsteadProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <span className="text-xl">🎙️</span>
+        <Mic className="w-5 h-5 text-amber-700" />
         <h4 className="font-bold text-base text-[#1B1B3A]">
           Say This Instead (Field Negotiation Coaching)
         </h4>
@@ -62,14 +63,16 @@ export const SayThisInstead: React.FC<SayThisInsteadProps> = ({
             {/* Recommended better line */}
             <div className="text-sm bg-white p-3 rounded-lg border border-emerald-200 space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#2D6A4F] uppercase tracking-wide">
-                  ✓ Recommended Power Counter:
+                <span className="text-xs font-bold text-[#2D6A4F] uppercase tracking-wide flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Recommended Power Counter:</span>
                 </span>
                 <button
                   onClick={() => handlePlayVoice(item.better, idx)}
                   className="stamp-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-900 text-xs px-2.5 py-1 flex items-center gap-1"
                 >
-                  <span>{playingIndex === idx ? 'Playing...' : '🔊 Listen (Timbre)'}</span>
+                  <Volume2 className="w-3.5 h-3.5" />
+                  <span>{playingIndex === idx ? 'Playing...' : 'Listen (Timbre)'}</span>
                 </button>
               </div>
               <p className="font-semibold text-[#1B1B3A] leading-snug">

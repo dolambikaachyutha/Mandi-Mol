@@ -1,4 +1,5 @@
 import React from 'react';
+import { Sliders, Mic, TrendingUp } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { t } from '../../lib/i18n';
 
@@ -9,9 +10,9 @@ interface HowItWorksProps {
 export const HowItWorks: React.FC<HowItWorksProps> = ({ onNavigateArchitecture }) => {
   const uiLanguage = useGame((state) => state.uiLanguage);
   const steps = [
-    { number: '01', title: 'setupStep', description: 'setupStepDescription', icon: '🧺', color: 'border-sky-500 bg-sky-50/50' },
-    { number: '02', title: 'bargainStep', description: 'bargainStepDescription', icon: '🎙️', color: 'border-amber-500 bg-amber-50/50' },
-    { number: '03', title: 'reviewStep', description: 'reviewStepDescription', icon: '📊', color: 'border-emerald-500 bg-emerald-50/50' },
+    { number: '01', title: 'setupStep', description: 'setupStepDescription', icon: Sliders, color: 'border-sky-500 bg-sky-50/50' },
+    { number: '02', title: 'bargainStep', description: 'bargainStepDescription', icon: Mic, color: 'border-amber-500 bg-amber-50/50' },
+    { number: '03', title: 'reviewStep', description: 'reviewStepDescription', icon: TrendingUp, color: 'border-emerald-500 bg-emerald-50/50' },
   ];
 
   return (
@@ -28,23 +29,28 @@ export const HowItWorks: React.FC<HowItWorksProps> = ({ onNavigateArchitecture }
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              className={`mandi-card p-6 border-3 border-[#1B1B3A] shadow-[5px_5px_0px_#1B1B3A] space-y-4 ${step.color}`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-3xl">{step.icon}</span>
-                <span className="font-mono text-2xl font-black text-[#1B1B3A]/30">{step.number}</span>
+          {steps.map((step) => {
+            const Icon = step.icon;
+            return (
+              <div
+                key={step.number}
+                className={`mandi-card p-6 border-3 border-[#1B1B3A] shadow-[5px_5px_0px_#1B1B3A] space-y-4 ${step.color}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-white border-2 border-[#1B1B3A] flex items-center justify-center shadow-sm">
+                    <Icon className="w-5 h-5 text-[#1B1B3A]" />
+                  </div>
+                  <span className="font-mono text-2xl font-black text-[#1B1B3A]/30">{step.number}</span>
+                </div>
+                <h3 className="font-display text-xl font-bold text-[#1B1B3A] leading-snug">
+                  {t(uiLanguage, step.title)}
+                </h3>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {t(uiLanguage, step.description)}
+                </p>
               </div>
-              <h3 className="font-display text-xl font-bold text-[#1B1B3A] leading-snug">
-                {t(uiLanguage, step.title)}
-              </h3>
-              <p className="text-sm text-slate-700 leading-relaxed">
-                {t(uiLanguage, step.description)}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="text-center pt-2">

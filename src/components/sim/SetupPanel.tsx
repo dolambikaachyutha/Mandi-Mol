@@ -1,8 +1,10 @@
 import React from 'react';
+import { Scale, Sprout, Briefcase, Flame } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { CROPS } from '../../lib/crops';
 import { LANGUAGES } from '../../lib/languages';
 import { t } from '../../lib/i18n';
+import { CropIcon } from '../common/CropIcon';
 import { Crop, Difficulty, Language } from '../../types';
 
 interface SetupPanelProps {
@@ -19,7 +21,9 @@ export const SetupPanel: React.FC<SetupPanelProps> = ({ onStart }) => {
     <div className="max-w-xl mx-auto mandi-card p-6 sm:p-8 bg-[#FFFDF8] border-3 border-[#1B1B3A] shadow-[6px_6px_0px_#1B1B3A] space-y-6">
       {/* Top Banner */}
       <div className="text-center pb-4 border-b-2 border-amber-200">
-        <span className="text-3xl">⚖️</span>
+        <div className="w-12 h-12 mx-auto rounded-2xl bg-[#1B1B3A] text-[#F2B705] flex items-center justify-center border-2 border-[#1B1B3A] mb-2 shadow">
+          <Scale className="w-6 h-6" />
+        </div>
         <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#1B1B3A] mt-1">
           {t(uiLanguage, 'setupTitle')}
         </h2>
@@ -31,18 +35,18 @@ export const SetupPanel: React.FC<SetupPanelProps> = ({ onStart }) => {
       {/* Role Selection (Module 3 Dual Roles) */}
       <div className="space-y-2 bg-amber-50 p-3.5 rounded-xl border-2 border-amber-300">
         <label className="block text-xs font-bold uppercase tracking-wider text-[#1B1B3A]">
-          🎭 Simulation Role (भूमिका चुनें)
+          Simulation Role (भूमिका चुनें)
         </label>
         <div className="grid grid-cols-2 gap-2">
           <div className="p-2.5 rounded-xl border-2 border-[#1B1B3A] bg-[#1B1B3A] text-[#F2B705] font-bold text-xs flex items-center gap-2">
-            <span>🌾</span>
+            <Sprout className="w-4 h-4 text-emerald-400" />
             <div>
               <p>Farmer (विक्रेता किसान)</p>
               <p className="text-[10px] text-stone-300 font-normal">Sell to tough trader</p>
             </div>
           </div>
           <div className="p-2.5 rounded-xl border-2 border-stone-300 bg-white text-stone-700 font-bold text-xs flex items-center gap-2">
-            <span>💼</span>
+            <Briefcase className="w-4 h-4 text-stone-600" />
             <div>
               <p>Trader (क्रेता व्यापारी)</p>
               <p className="text-[10px] text-stone-500 font-normal">Practice sourcing produce</p>
@@ -71,7 +75,9 @@ export const SetupPanel: React.FC<SetupPanelProps> = ({ onStart }) => {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl">{c.icon}</span>
+                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0">
+                    <CropIcon cropId={c.id} className="w-5 h-5" />
+                  </div>
                   <span className="font-mono text-xs font-bold text-[#D62828] bg-white px-2 py-0.5 rounded border border-slate-200">
                     {t(uiLanguage, 'practicePrices')}: ₹{c.referencePrice}/kg
                   </span>
@@ -133,7 +139,7 @@ export const SetupPanel: React.FC<SetupPanelProps> = ({ onStart }) => {
                 }`}
               >
                 <div className="flex items-center gap-1.5 font-bold text-sm text-[#1B1B3A] capitalize">
-                  <span>{d === 'easy' ? '🌱' : '🔥'}</span>
+                  {d === 'easy' ? <Sprout className="w-4 h-4 text-emerald-600" /> : <Flame className="w-4 h-4 text-red-600" />}
                   <span>{t(uiLanguage, d)}</span>
                 </div>
                 <p className="text-xs text-slate-600 mt-1">

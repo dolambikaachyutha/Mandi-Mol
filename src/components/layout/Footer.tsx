@@ -1,4 +1,5 @@
 import React from 'react';
+import { Scale } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { t } from '../../lib/i18n';
 
@@ -10,7 +11,7 @@ export const Footer: React.FC = () => {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🌶️</span>
+            <Scale className="w-6 h-6 text-[#F2B705]" />
             <span className="font-display text-2xl font-bold text-[#F2B705]">Mandi Mol</span>
           </div>
           <p className="text-sm text-slate-300 mt-2 max-w-md">

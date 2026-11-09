@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Store } from 'lucide-react';
 
 interface SpeechBubbleProps {
   text: string;
@@ -31,7 +32,7 @@ export const SpeechBubble: React.FC<SpeechBubbleProps> = ({
       {/* Speaker header */}
       <div className="flex items-center justify-between pb-2 mb-2 border-b border-amber-200 text-xs font-bold text-[#8B5E34]">
         <div className="flex items-center gap-1.5">
-          <span>👳🏽‍♂️</span>
+          <Store className="w-4 h-4 text-amber-800" />
           <span>{speakerName}</span>
         </div>
         <span className="font-mono text-[10px] text-slate-500 bg-amber-100 px-2 py-0.5 rounded">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { TrendingUp, Compass, Mic, FileText } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { t } from '../../lib/i18n';
 
@@ -13,26 +14,26 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onNavigate }) 
   const navItems = [
     {
       id: 'prices',
-      icon: '📊',
+      icon: TrendingUp,
       label: uiLanguage === 'hi' ? 'आज का भाव' : uiLanguage === 'te' ? 'ధరలు' : 'Prices',
       sublabel: 'Agmarknet',
       badge: 'LIVE',
     },
     {
       id: 'planner',
-      icon: '🗺️',
+      icon: Compass,
       label: uiLanguage === 'hi' ? 'प्लानर' : uiLanguage === 'te' ? 'ప్లానర్' : 'Plan',
       sublabel: 'Pre-trip',
     },
     {
       id: 'simulator',
-      icon: '🎙️',
+      icon: Mic,
       label: uiLanguage === 'hi' ? 'मोल-भाव' : uiLanguage === 'te' ? 'ప్రాక్టీస్' : 'Practice',
       sublabel: 'Simulate',
     },
     {
       id: 'deals',
-      icon: '📜',
+      icon: FileText,
       label: uiLanguage === 'hi' ? 'सौदा बही' : uiLanguage === 'te' ? 'డీల్స్' : 'My Deals',
       sublabel: 'Proof & Slip',
     },
@@ -46,6 +47,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onNavigate }) 
       <div className="max-w-md mx-auto grid grid-cols-4 px-1 py-1.5">
         {navItems.map((item) => {
           const isActive = currentTab === item.id;
+          const Icon = item.icon;
           return (
             <button
               key={item.id}
@@ -68,8 +70,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onNavigate }) 
                   {item.badge}
                 </span>
               )}
-              <span className="text-xl sm:text-2xl leading-none mb-0.5" role="img" aria-hidden="true">
-                {item.icon}
+              <span className="mb-0.5" aria-hidden="true">
+                <Icon className={`w-5 h-5 ${isActive ? 'text-[#F2B705]' : 'text-[#1B1B3A]'}`} />
               </span>
               <span className={`text-xs font-bold leading-tight ${isActive ? 'text-[#F2B705]' : 'text-[#1B1B3A]'}`}>
                 {item.label}

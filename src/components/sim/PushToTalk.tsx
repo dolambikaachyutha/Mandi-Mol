@@ -1,4 +1,5 @@
 import React from 'react';
+import { Square, Clock, Mic, Keyboard, RefreshCw, Sparkles, Volume2 } from 'lucide-react';
 import { useGame } from '../../store/useGame';
 import { LANGUAGES } from '../../lib/languages';
 import { t } from '../../lib/i18n';
@@ -72,17 +73,16 @@ export const PushToTalk: React.FC = () => {
             disabled={isBusy}
             aria-label={isRecording ? 'Stop recording voice' : 'Start speaking'}
             aria-pressed={isRecording}
-            className={`w-20 h-20 rounded-full flex flex-col items-center justify-center border-3 border-[#1B1B3A] shadow-[4px_4px_0px_#1B1B3A] transition-all transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#1B1B3A] select-none ${
-              isRecording
+            className={`w-20 h-20 rounded-full flex flex-col items-center justify-center border-3 border-[#1B1B3A] shadow-[4px_4px_0px_#1B1B3A] transition-all transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-[2px_2px_0px_#1B1B3A] select-none ${isRecording
                 ? 'bg-[#D62828] text-white scale-105'
                 : isBusy
-                ? 'bg-amber-100 text-slate-400 cursor-not-allowed'
-                : 'bg-[#F2B705] hover:bg-amber-400 text-[#1B1B3A]'
-            }`}
+                  ? 'bg-amber-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-[#F2B705] hover:bg-amber-400 text-[#1B1B3A]'
+              }`}
           >
-            <span className="text-2xl" role="img" aria-hidden="true">
-              {isRecording ? '⏹️' : isThinking ? '⏳' : '🎙️'}
-            </span>
+            <div className="flex items-center justify-center">
+              {isRecording ? <Square className="w-6 h-6" /> : isThinking ? <Clock className="w-6 h-6 animate-pulse" /> : <Mic className="w-6 h-6" />}
+            </div>
             <span className="text-[10px] font-bold uppercase mt-0.5 tracking-tight">
               {isRecording
                 ? t(uiLanguage, 'stop')
@@ -98,13 +98,12 @@ export const PushToTalk: React.FC = () => {
         {/* Text fallback toggle */}
         <button
           onClick={() => setTextInputActive(!isTextInputActive)}
-          className={`stamp-btn p-3 rounded-xl flex items-center justify-center ${
-            isTextInputActive ? 'bg-[#1B1B3A] text-white' : 'bg-white text-[#1B1B3A]'
-          }`}
+          className={`stamp-btn p-3 rounded-xl flex items-center justify-center ${isTextInputActive ? 'bg-[#1B1B3A] text-white' : 'bg-white text-[#1B1B3A]'
+            }`}
           title="Type your counter-offer manually (keyboard fallback)"
           aria-label="Toggle text input"
         >
-          <span className="text-xl">⌨️</span>
+          <Keyboard className="w-5 h-5" />
         </button>
       </div>
 
@@ -121,19 +120,19 @@ export const PushToTalk: React.FC = () => {
         )}
         {isTranscribing && (
           <span className="text-amber-700 flex items-center gap-1.5 justify-center">
-            <span className="animate-spin text-sm">🔄</span>
+            <RefreshCw className="animate-spin w-4 h-4" />
             {t(uiLanguage, 'transcribing')}
           </span>
         )}
         {isThinking && (
           <span className="text-indigo-800 flex items-center gap-1.5 justify-center">
-            <span className="animate-bounce text-sm">💭</span>
+            <Sparkles className="animate-bounce w-4 h-4 text-indigo-600" />
             {t(uiLanguage, 'thinking')}
           </span>
         )}
         {isSpeaking && (
           <span className="text-emerald-800 flex items-center gap-1.5 justify-center">
-            <span className="text-sm">🔊</span>
+            <Volume2 className="w-4 h-4" />
             {t(uiLanguage, 'speaking')}
           </span>
         )}
