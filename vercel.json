@@ -3,26 +3,14 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "functions": {
-    "api/*.js": {
+    "api/index.js": {
       "maxDuration": 60
     }
   },
   "rewrites": [
     {
-      "source": "/api/practice/session",
-      "destination": "/api/practiceSession.js"
-    },
-    {
-      "source": "/api/practice/turn",
-      "destination": "/api/practiceTurn.js"
-    },
-    {
-      "source": "/api/fpo-dashboard",
-      "destination": "/api/fpoDashboard.js"
-    },
-    {
-      "source": "/api/whatsapp",
-      "destination": "/api/whatsappWebhook.js"
+      "source": "/api/:path*",
+      "destination": "/api/index.js?__route=:path*"
     },
     {
       "source": "/((?!api/).*)",
@@ -33,16 +21,31 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "microphone=(self)" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "microphone=(self)"
+        }
       ]
     },
     {
       "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     }
   ]

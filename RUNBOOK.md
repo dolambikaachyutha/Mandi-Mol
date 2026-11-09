@@ -66,13 +66,13 @@ npm run build
 ```
 Under the hood, `npm run build` runs:
 1. `vite build`: Compiles the React 19 single-page application into `dist/`.
-2. `node ./scripts/build-api.js`: Uses `esbuild` to compile all 16 serverless functions in `server/api-entries/` into self-contained ESM bundles in `api/*.js`.
+2. `node ./scripts/build-api.js`: Uses `esbuild` to compile a unified API Gateway router into a single self-contained ESM bundle at `api/index.js` (107 KB). This guarantees that Vercel uses **exactly 1 Serverless Function**, staying well below the Vercel Hobby plan limit of 12 functions while preserving shared in-memory repository cache across all endpoints.
 
 ### Deployment to Vercel:
 ```bash
 git push origin main
 ```
-Vercel automatically detects the build command, deploys the static frontend to its global CDN, and attaches each `api/*.js` bundle to high-performance Serverless Functions running Node 22.
+Vercel automatically detects the build command, deploys the static frontend to its global CDN, and attaches `api/index.js` as the single unified serverless function handling all `/api/*` traffic via `vercel.json` rewrites.
 
 ---
 

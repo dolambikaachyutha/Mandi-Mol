@@ -72,6 +72,6 @@ This matrix maps every architectural principle, product module, and security req
 | **Circuit Breakers & Timeouts** | **DONE** | `server/functions/_gnani.ts`, `server/functions/health.ts` | 3 consecutive failures trigger 30s open state; AbortSignal timeouts (10s STT, 8s TTS, 12s Evon). |
 | **Audio Duration Limit** | **DONE** | `server/db/repository.ts` | Rejects payloads exceeding 2 MB (~12 seconds). |
 | **Meta WhatsApp Cloud Gateway** | **DONE** | `server/functions/whatsappWebhook.ts` | Webhook verification (GET) and incoming message processing (POST) behind `ENABLE_WHATSAPP_GATEWAY` feature flag. |
-| **Vercel Serverless Function Bundling** | **DONE** | `scripts/build-api.js`, `api/*.js` | Self-contained ESM bundles compiled with esbuild, eliminating Node 22 missing relative file errors. |
+| **Vercel Serverless Function Bundling** | **DONE** | `scripts/build-api.js`, `api/index.js`, `vercel.json` | Unified ESM gateway router bundle (1 Serverless Function used out of 12 allowed on Hobby plan). Fully eliminates the 12-function deployment limit and shares in-memory cache. |
 | **Automated CI Workflow** | **DONE** | `.github/workflows/ci.yml` | Linting (`npm run lint`), Vitest tests (`npm test`), and production build (`npm run build`). |
 

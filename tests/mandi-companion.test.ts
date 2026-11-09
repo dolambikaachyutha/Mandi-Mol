@@ -6,6 +6,7 @@ import { handler as plannerHandler } from '../server/functions/planner';
 import { handler as dealsHandler } from '../server/functions/deals';
 import { handler as profileHandler } from '../server/functions/profile';
 import { handler as alertsHandler } from '../server/functions/alerts';
+import { unifiedGatewayHandler } from '../server/api-entries/index';
 import type { FunctionEvent } from '../server/functions/types';
 
 function createMockEvent(options: {
@@ -232,5 +233,59 @@ describe('Mandi Mol Real Product Contract & Security Suite', () => {
     const validBase64 = Buffer.alloc(150 * 1024).toString('base64');
     const validResult = repository.validateAudioPayload(validBase64);
     expect(validResult.valid).toBe(true);
+  });
+
+  // --------------------------------------------------------------------------
+  // 7. Vercel Hobby Compliance: Unified Router (1/12 Serverless Functions)
+  // --------------------------------------------------------------------------
+  it('unifiedGatewayHandler correctly dispatches across multiple API endpoints', async () => {
+    // Test 1: Root /api info
+    const infoRes = await unifiedGatewayHandler(
+      createMockEvent({ method: 'GET', path: '/api', query: {} })
+    );
+    expect(infoRes.statusCode).toBe(200);
+    const infoBody = JSON.parse(infoRes.body || '{}');
+    expect(infoBody.name).toContain('Unified API Gateway');
+
+    // Test 2: /api/health dispatch
+    const healthRes = await unifiedGatewayHandler(
+      createMockEvent({ method: 'GET', path: '/api/health', query: { __route: 'health' } })
+    );
+    expect(healthRes.statusCode).toBe(200);
+
+    // Test 3: /api/prices dispatch with query
+    const pricesRes = await unifiedGatewayHandler(
+      createMockEvent({
+        method: 'GET',
+        path: '/api/prices',
+        query: { __route: 'prices', state: 'Telangana', district: 'Warangal' },
+      })
+    );
+    expect(pricesRes.statusCode).toBe(200);
+    const pricesBody = JSON.parse(pricesRes.body || '{}');
+    expect(pricesBody.markets.length).toBeGreaterThan(0);
+
+    // Test 4: /api/practice/session rewrite dispatch
+    const sessionRes = await unifiedGatewayHandler(
+      createMockEvent({
+        method: 'POST',
+        path: '/api/practice/session',
+        query: { __route: 'practice/session' },
+        body: { userId: 'gateway_test_user', cropId: 'wheat' },
+      })
+    );
+    expect(sessionRes.statusCode).toBe(200);
+    const sessionBody = JSON.parse(sessionRes.body || '{}');
+    expect(sessionBody.sessionId).toBeDefined();
+
+    // Test 5: Unknown route returns 404
+    const notFoundRes = await unifiedGatewayHandler(
+      createMockEvent({
+        method: 'GET',
+        path: '/api/unknown-endpoint',
+        query: { __route: 'unknown-endpoint' },
+      })
+    );
+    expect(notFoundRes.statusCode).toBe(404);
   });
 });
