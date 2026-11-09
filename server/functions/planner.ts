@@ -113,19 +113,49 @@ export const handler: Handler = async (event) => {
 
     const plainExplanation = `For your ${quantityQuintals} Quintals (${quantityKg} kg), ${bestMandi.market} offers the strongest net-in-hand payout of ₹${bestMandi.netInHand.toLocaleString('en-IN')} (net ₹${bestMandi.netRealizationPerKg}/kg), which is ₹${netGainVsWorst.toLocaleString('en-IN')} higher than other markets after logistics. Do not sell below ₹${recommendedFloorPerKg}/kg.`;
 
+    const mandiComparisons = comparisons.map((m, idx) => ({
+      market: m.market,
+      distanceKm: m.distanceKm,
+      modalPricePerKg: m.modalPriceKg,
+      modalPriceQuintal: m.modalPriceQuintal,
+      grossRevenueRs: m.grossValue,
+      transportDeductionRs: m.transportCost,
+      mandiFeeDeductionRs: m.mandiFee,
+      hamaliDeductionRs: m.weighmentFee,
+      netInHandTotalRs: m.netInHand,
+      netPerKgRs: m.netRealizationPerKg,
+      isBestMarket: idx === 0,
+    }));
+
+    const topTricksAtMandi = likelyTricks.map((t) => ({
+      trick: t.name,
+      name: t.name,
+      description: t.description,
+      counterMeasure: t.counterMeasure,
+    }));
+
     return {
       statusCode: 200,
       headers: CORS_HEADERS,
       body: JSON.stringify({
+        crop: {
+          id: cropId,
+          name: cropId,
+          grade: qualityGrade,
+        },
         cropId,
         quantityKg,
         quantityQuintals,
         qualityGrade,
+        bestMarketToday: bestMandi.market,
         bestMandi,
         netGainVsWorst,
+        recommendedFloorPricePerKg: recommendedFloorPerKg,
         recommendedFloorPerKg,
         recommendedFloorQuintal,
+        mandiComparisons,
         comparisons,
+        topTricksAtMandi,
         likelyTricks,
         plainExplanation,
         disclaimer: 'Pre-trip logistics estimate based on Agmarknet modal benchmarks. Final weighment and grading conducted at APMC yard.',
