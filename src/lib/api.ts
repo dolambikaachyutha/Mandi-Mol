@@ -1,4 +1,14 @@
-import { CoachFeedback, Difficulty, ProviderHealth, TrickId } from '../types';
+import {
+  CoachFeedback,
+  Difficulty,
+  MonthlyImpactSummary,
+  PriceAlert,
+  PricesApiResponse,
+  ProviderHealth,
+  RealDeal,
+  SellPlanResponse,
+  TrickId,
+} from '../types';
 
 export interface TraderTurnRequest {
   farmerSpeech: string;
@@ -327,3 +337,246 @@ export async function requestCoachScorecard(payload: {
     tone: 'Respectful, data-driven, and clear on commercial terms.',
   };
 }
+
+// ============================================================================
+// MODULE 1: LIVE MANDI PRICES & VOICE SEARCH API
+// ============================================================================
+
+export async function fetchMandiPrices(params?: {
+  state?: string;
+  district?: string;
+  mandi?: string;
+  cropId?: string;
+}): Promise<PricesApiResponse> {
+  const query = new URLSearchParams();
+  if (params?.state) query.set('state', params.state);
+  if (params?.district) query.set('district', params.district);
+  if (params?.mandi) query.set('mandi', params.mandi);
+  if (params?.cropId) query.set('cropId', params.cropId);
+
+  const res = await fetch(`/api/prices?${query.toString()}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch mandi prices: HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function queryMandiVoice(payload: {
+  audioBase64?: string;
+  queryText?: string;
+  mandiLocation?: string;
+  languageCode?: string;
+}): Promise<{
+  recognizedQuery: string;
+  mandiLocation: string;
+  audioReplyBase64?: string;
+  ttsAvailable: boolean;
+  data: {
+    crop: string;
+    modalPricePerKg: number;
+    modalPriceQuintal: number;
+    minPricePerKg: number;
+    maxPricePerKg: number;
+    arrivalDate: string;
+    source: string;
+    spokenAnswer: string;
+  };
+}> {
+  const json = await postJson('/api/voiceQuery', payload);
+  return json as unknown as {
+    recognizedQuery: string;
+    mandiLocation: string;
+    audioReplyBase64?: string;
+    ttsAvailable: boolean;
+    data: {
+      crop: string;
+      modalPricePerKg: number;
+      modalPriceQuintal: number;
+      minPricePerKg: number;
+      maxPricePerKg: number;
+      arrivalDate: string;
+      source: string;
+      spokenAnswer: string;
+    };
+  };
+}
+
+// ============================================================================
+// MODULE 2: SELL PLANNER API
+// ============================================================================
+
+export async function fetchSellPlan(params: {
+  cropId: string;
+  quantityKg: number;
+  grade?: string;
+  transportCostPerQuintal?: number;
+  mandiFeePct?: number;
+  hamaliPerBag?: number;
+}): Promise<SellPlanResponse> {
+  const json = await postJson('/api/planner', params);
+  return json as unknown as SellPlanResponse;
+}
+
+// ============================================================================
+// MODULE 4: REAL DEAL LEDGER & SAUDA SLIP API
+// ============================================================================
+
+export async function fetchUserDeals(userId: string): Promise<{
+  deals: RealDeal[];
+  summary: MonthlyImpactSummary;
+  totalDeals: number;
+}> {
+  const res = await fetch(`/api/deals?userId=${encodeURIComponent(userId)}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch user deals: HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function recordRealDeal(dealData: {
+  userId: string;
+  cropId: string;
+  mandiLocation: string;
+  quantityKg: number;
+  pricePerKg: number;
+  buyerSellerName?: string;
+  paymentMode?: string;
+  dealType?: 'sold' | 'bought';
+  notes?: string;
+  date?: string;
+}): Promise<{
+  success: boolean;
+  deal: RealDeal;
+  summary: MonthlyImpactSummary;
+  receipt: {
+    receiptNo: string;
+    dealId: string;
+    date: string;
+    crop: string;
+    mandi: string;
+    party: string;
+    role: string;
+    quantityKg: number;
+    quantityQuintal: number;
+    ratePerKg: number;
+    ratePerQuintal: number;
+    grossTotalRs: number;
+    paymentMode: string;
+    diffVsMarketTotalRs: number;
+    disputeProofNotice: string;
+  };
+}> {
+  const json = await postJson('/api/deals', dealData);
+  return json as unknown as {
+    success: boolean;
+    deal: RealDeal;
+    summary: MonthlyImpactSummary;
+    receipt: {
+      receiptNo: string;
+      dealId: string;
+      date: string;
+      crop: string;
+      mandi: string;
+      party: string;
+      role: string;
+      quantityKg: number;
+      quantityQuintal: number;
+      ratePerKg: number;
+      ratePerQuintal: number;
+      grossTotalRs: number;
+      paymentMode: string;
+      diffVsMarketTotalRs: number;
+      disputeProofNotice: string;
+    };
+  };
+}
+
+// ============================================================================
+// MODULE 1: PRICE ALERTS API
+// ============================================================================
+
+export async function fetchUserAlerts(userId: string): Promise<{
+  alerts: PriceAlert[];
+  totalAlerts: number;
+}> {
+  const res = await fetch(`/api/alerts?userId=${encodeURIComponent(userId)}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch alerts: HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+export async function createPriceAlert(alertData: {
+  userId: string;
+  cropId: string;
+  mandiLocation: string;
+  targetPricePerKg: number;
+  condition: 'above' | 'below';
+  channel?: 'push' | 'whatsapp';
+  phone?: string;
+}): Promise<{
+  success: boolean;
+  alert: PriceAlert;
+  currentModalPricePerKg: number;
+  status: string;
+  message: string;
+}> {
+  const json = await postJson('/api/alerts', alertData);
+  return json as unknown as {
+    success: boolean;
+    alert: PriceAlert;
+    currentModalPricePerKg: number;
+    status: string;
+    message: string;
+  };
+}
+
+// ============================================================================
+// MODULE 4: FPO ANALYTICS API (Min 5 Users DPDP Standard)
+// ============================================================================
+
+export async function fetchFpoAnalytics(): Promise<{
+  privacyStandard: string;
+  totalAggregatedGroups: number;
+  redactedDueToPrivacyThreshold: number;
+  groups: Array<{
+    cropId: string;
+    mandiLocation: string;
+    totalUsers: number;
+    totalSessions: number;
+    avgPremiumVsMarketRsPerKg: number;
+    totalVolumeTradedRs: number;
+    tricksVulnerability: Record<string, number>;
+  }>;
+  commonMandiTricksAggregate: Array<{
+    trick: string;
+    failureRatePct: number;
+    counterTip: string;
+  }>;
+}> {
+  const res = await fetch('/api/fpo-dashboard');
+  if (!res.ok) {
+    throw new Error(`Failed to fetch FPO analytics: HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// ============================================================================
+// DPDP PRIVACY: CASCADE DELETE USER DATA
+// ============================================================================
+
+export async function deleteUserData(userId: string): Promise<{
+  purgedUserId: string;
+  deletedDealsCount: number;
+  deletedSessionsCount: number;
+  deletedAlertsCount: number;
+}> {
+  const res = await fetch(`/api/profile?userId=${encodeURIComponent(userId)}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to delete profile: HTTP ${res.status}`);
+  }
+  return res.json();
+}
+

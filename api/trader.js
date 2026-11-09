@@ -1,4 +1,52 @@
 // server/functions/_gnani.ts
+var circuits = {
+  prisma: { failures: 0, lastFailure: 0, isOpen: false },
+  timbre: { failures: 0, lastFailure: 0, isOpen: false },
+  evon: { failures: 0, lastFailure: 0, isOpen: false }
+};
+var CIRCUIT_FAILURE_THRESHOLD = 3;
+var CIRCUIT_COOLDOWN_MS = 3e4;
+function checkCircuit(name) {
+  const c = circuits[name];
+  if (c.isOpen) {
+    if (Date.now() - c.lastFailure > CIRCUIT_COOLDOWN_MS) {
+      c.isOpen = false;
+      c.failures = 0;
+    } else {
+      throw new Error(`GNANI_CIRCUIT_OPEN: ${name.toUpperCase()} circuit is open due to recent failures. Request rejected to prevent cascading errors.`);
+    }
+  }
+}
+function recordCircuitSuccess(name) {
+  circuits[name].failures = 0;
+  circuits[name].isOpen = false;
+}
+function recordCircuitFailure(name) {
+  const c = circuits[name];
+  c.failures += 1;
+  c.lastFailure = Date.now();
+  if (c.failures >= CIRCUIT_FAILURE_THRESHOLD) {
+    c.isOpen = true;
+  }
+}
+async function withRetry(fn, retries = 2, baseDelayMs = 300) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      const isTransient = /timeout|aborted|network|HTTP_5/i.test(msg);
+      if (!isTransient || attempt === retries) {
+        throw err;
+      }
+      const delay = baseDelayMs * Math.pow(2, attempt);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw lastError;
+}
 function readEnv(name) {
   const value = process.env[name];
   if (!value) return null;
@@ -24,44 +72,59 @@ function getGnaniConfig() {
     evonModel: readEnv("EVON_MODEL") || "gnani-evon-v3.3"
   };
 }
+function isKillSwitchActive() {
+  return process.env.KILL_SWITCH === "true";
+}
 function isEvonConfigured() {
+  if (isKillSwitchActive()) return false;
   const config = getGnaniConfig();
   return Boolean(config.evonEndpoint && config.evonApiKey);
 }
 async function callEvonInference(systemPrompt, userPrompt) {
+  checkCircuit("evon");
   const config = getGnaniConfig();
-  if (!config.evonEndpoint || !config.evonApiKey) {
+  if (!config.evonEndpoint || !config.evonApiKey || isKillSwitchActive()) {
     throw new Error("EVON_NOT_CONFIGURED: Evon is not provisioned for this key.");
   }
-  const startTime = Date.now();
-  const response = await fetch(config.evonEndpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key-ID": config.evonApiKey,
-      Authorization: `Bearer ${config.evonApiKey}`
-    },
-    body: JSON.stringify({
-      model: config.evonModel,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      temperature: 0.3,
-      max_tokens: 400
-    })
+  return await withRetry(async () => {
+    const startTime = Date.now();
+    try {
+      const response = await fetch(config.evonEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key-ID": config.evonApiKey,
+          Authorization: `Bearer ${config.evonApiKey}`
+        },
+        body: JSON.stringify({
+          model: config.evonModel,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          temperature: 0.3,
+          max_tokens: 450
+        }),
+        signal: AbortSignal.timeout(12e3)
+        // 12s timeout
+      });
+      const latencyMs = Date.now() - startTime;
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`EVON_HTTP_${response.status}: ${errText}`);
+      }
+      const json = await response.json();
+      const rawText = json.choices?.[0]?.message?.content || json.content || json.text || json.output || "";
+      if (!rawText.trim()) {
+        throw new Error("EVON_EMPTY_RESPONSE: Model returned no text.");
+      }
+      recordCircuitSuccess("evon");
+      return { rawText, latencyMs, model: config.evonModel };
+    } catch (err) {
+      recordCircuitFailure("evon");
+      throw err;
+    }
   });
-  const latencyMs = Date.now() - startTime;
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(`EVON_HTTP_${response.status}: ${errText}`);
-  }
-  const json = await response.json();
-  const rawText = json.choices?.[0]?.message?.content || json.content || json.text || json.output || "";
-  if (!rawText.trim()) {
-    throw new Error("EVON_EMPTY_RESPONSE: Model returned no text.");
-  }
-  return { rawText, latencyMs, model: config.evonModel };
 }
 
 // server/functions/_brain.ts
@@ -390,7 +453,7 @@ async function extractBody(request) {
   if (request.body !== void 0 && request.body !== null) {
     return serializeBody(request.body);
   }
-  if (request.method === "GET" || request.method === "HEAD") {
+  if (request.method === "GET" || request.method === "HEAD" || request.readableEnded) {
     return null;
   }
   return new Promise((resolve, reject) => {

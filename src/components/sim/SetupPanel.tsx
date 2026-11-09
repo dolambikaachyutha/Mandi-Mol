@@ -23,9 +23,32 @@ export const SetupPanel: React.FC<SetupPanelProps> = ({ onStart }) => {
         <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[#1B1B3A] mt-1">
           {t(uiLanguage, 'setupTitle')}
         </h2>
-        <p className="text-sm text-slate-600 mt-1">
-          {t(uiLanguage, 'setupDescription')}
+        <p className="text-xs sm:text-sm text-slate-600 mt-1">
+          Simulate high-stakes APMC bargaining. Reference prices anchored directly to Module 1 live market modal benchmarks.
         </p>
+      </div>
+
+      {/* Role Selection (Module 3 Dual Roles) */}
+      <div className="space-y-2 bg-amber-50 p-3.5 rounded-xl border-2 border-amber-300">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[#1B1B3A]">
+          🎭 Simulation Role (भूमिका चुनें)
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="p-2.5 rounded-xl border-2 border-[#1B1B3A] bg-[#1B1B3A] text-[#F2B705] font-bold text-xs flex items-center gap-2">
+            <span>🌾</span>
+            <div>
+              <p>Farmer (विक्रेता किसान)</p>
+              <p className="text-[10px] text-stone-300 font-normal">Sell to tough trader</p>
+            </div>
+          </div>
+          <div className="p-2.5 rounded-xl border-2 border-stone-300 bg-white text-stone-700 font-bold text-xs flex items-center gap-2">
+            <span>💼</span>
+            <div>
+              <p>Trader (क्रेता व्यापारी)</p>
+              <p className="text-[10px] text-stone-500 font-normal">Practice sourcing produce</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 1. Crop Selection */}

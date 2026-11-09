@@ -1,4 +1,52 @@
 // server/functions/_gnani.ts
+var circuits = {
+  prisma: { failures: 0, lastFailure: 0, isOpen: false },
+  timbre: { failures: 0, lastFailure: 0, isOpen: false },
+  evon: { failures: 0, lastFailure: 0, isOpen: false }
+};
+var CIRCUIT_FAILURE_THRESHOLD = 3;
+var CIRCUIT_COOLDOWN_MS = 3e4;
+function checkCircuit(name) {
+  const c = circuits[name];
+  if (c.isOpen) {
+    if (Date.now() - c.lastFailure > CIRCUIT_COOLDOWN_MS) {
+      c.isOpen = false;
+      c.failures = 0;
+    } else {
+      throw new Error(`GNANI_CIRCUIT_OPEN: ${name.toUpperCase()} circuit is open due to recent failures. Request rejected to prevent cascading errors.`);
+    }
+  }
+}
+function recordCircuitSuccess(name) {
+  circuits[name].failures = 0;
+  circuits[name].isOpen = false;
+}
+function recordCircuitFailure(name) {
+  const c = circuits[name];
+  c.failures += 1;
+  c.lastFailure = Date.now();
+  if (c.failures >= CIRCUIT_FAILURE_THRESHOLD) {
+    c.isOpen = true;
+  }
+}
+async function withRetry(fn, retries = 2, baseDelayMs = 300) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      const isTransient = /timeout|aborted|network|HTTP_5/i.test(msg);
+      if (!isTransient || attempt === retries) {
+        throw err;
+      }
+      const delay = baseDelayMs * Math.pow(2, attempt);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw lastError;
+}
 function readEnv(name) {
   const value = process.env[name];
   if (!value) return null;
@@ -24,58 +72,85 @@ function getGnaniConfig() {
     evonModel: readEnv("EVON_MODEL") || "gnani-evon-v3.3"
   };
 }
+function isKillSwitchActive() {
+  return process.env.KILL_SWITCH === "true";
+}
 function isSpeechConfigured() {
+  if (isKillSwitchActive()) return false;
   return Boolean(getGnaniConfig().apiKey);
 }
 function requireApiKey() {
+  if (isKillSwitchActive()) {
+    throw new Error("KILL_SWITCH_ACTIVE: Gnani AI services temporarily paused by admin kill switch.");
+  }
   const config = getGnaniConfig();
   if (!config.apiKey) {
-    throw new Error("CONFIG_ERROR: GNANI_API_KEY is not configured.");
+    throw new Error("CONFIG_ERROR: GNANI_API_KEY is not configured in Vercel environment variables.");
   }
   return config;
 }
+var ttsMemoryCache = /* @__PURE__ */ new Map();
 async function callTimbreTts(text, voice, language, model) {
+  checkCircuit("timbre");
   const config = requireApiKey();
-  const startTime = Date.now();
   const trimmed = text.slice(0, 480);
-  const response = await fetch(`${config.baseUrl}/api/v1/tts/inference`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-API-Key-ID": config.apiKey
-    },
-    body: JSON.stringify({
-      text: trimmed,
-      voice,
-      model: model || config.ttsModel,
-      language: language || "auto",
-      speed: 1.05,
-      // Mandi traders speak briskly
-      audio_config: { container: "mp3", bitrate: "128k" }
-    })
-  });
-  const latencyMs = Date.now() - startTime;
-  if (!response.ok) {
-    const errorText = await response.text();
-    let message = errorText;
+  const cacheKey = `${voice}_${language}_${trimmed}`;
+  const cached = ttsMemoryCache.get(cacheKey);
+  if (cached) {
+    return { ...cached, latencyMs: 5 };
+  }
+  return await withRetry(async () => {
+    const startTime = Date.now();
     try {
-      const parsed = JSON.parse(errorText);
-      message = parsed.message || parsed.detail?.message || errorText;
-    } catch {
+      const response = await fetch(`${config.baseUrl}/api/v1/tts/inference`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key-ID": config.apiKey
+        },
+        body: JSON.stringify({
+          text: trimmed,
+          voice,
+          model: model || config.ttsModel,
+          language: language || "auto",
+          speed: 1.05,
+          audio_config: { container: "mp3", bitrate: "128k" }
+        }),
+        signal: AbortSignal.timeout(8e3)
+        // 8s timeout
+      });
+      const latencyMs = Date.now() - startTime;
+      if (!response.ok) {
+        const errorText = await response.text();
+        let message = errorText;
+        try {
+          const parsed = JSON.parse(errorText);
+          message = parsed.message || parsed.detail?.message || errorText;
+        } catch {
+        }
+        throw new Error(`TIMBRE_HTTP_${response.status}: ${message}`);
+      }
+      const audio = Buffer.from(await response.arrayBuffer());
+      if (audio.length === 0) {
+        throw new Error("TIMBRE_EMPTY_AUDIO: Timbre returned empty stream.");
+      }
+      recordCircuitSuccess("timbre");
+      const result = {
+        audioBase64: audio.toString("base64"),
+        mime: response.headers.get("content-type") || "audio/mpeg",
+        chars: trimmed.length,
+        latencyMs,
+        model: model || config.ttsModel
+      };
+      if (ttsMemoryCache.size < 500) {
+        ttsMemoryCache.set(cacheKey, result);
+      }
+      return result;
+    } catch (err) {
+      recordCircuitFailure("timbre");
+      throw err;
     }
-    throw new Error(`TIMBRE_HTTP_${response.status}: ${message}`);
-  }
-  const audio = Buffer.from(await response.arrayBuffer());
-  if (audio.length === 0) {
-    throw new Error("TIMBRE_EMPTY_AUDIO: Timbre returned no audio.");
-  }
-  return {
-    audioBase64: audio.toString("base64"),
-    mime: response.headers.get("content-type") || "audio/mpeg",
-    chars: trimmed.length,
-    latencyMs,
-    model: model || config.ttsModel
-  };
+  });
 }
 
 // server/functions/tts.ts
@@ -188,7 +263,7 @@ async function extractBody(request) {
   if (request.body !== void 0 && request.body !== null) {
     return serializeBody(request.body);
   }
-  if (request.method === "GET" || request.method === "HEAD") {
+  if (request.method === "GET" || request.method === "HEAD" || request.readableEnded) {
     return null;
   }
   return new Promise((resolve, reject) => {

@@ -1,0 +1,19 @@
+{
+  "name": "Mandi Mol - Daily Mandi Companion & Voice Bargaining",
+  "short_name": "Mandi Mol",
+  "description": "Daily mandi prices from Agmarknet, net-in-hand sell planner, voice bargaining practice, and dispute-proof deal receipts.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1A1A3A",
+  "theme_color": "#F2B705",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/og-image.svg",
+      "sizes": "1200x630",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

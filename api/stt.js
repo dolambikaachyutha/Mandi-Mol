@@ -1,4 +1,52 @@
 // server/functions/_gnani.ts
+var circuits = {
+  prisma: { failures: 0, lastFailure: 0, isOpen: false },
+  timbre: { failures: 0, lastFailure: 0, isOpen: false },
+  evon: { failures: 0, lastFailure: 0, isOpen: false }
+};
+var CIRCUIT_FAILURE_THRESHOLD = 3;
+var CIRCUIT_COOLDOWN_MS = 3e4;
+function checkCircuit(name) {
+  const c = circuits[name];
+  if (c.isOpen) {
+    if (Date.now() - c.lastFailure > CIRCUIT_COOLDOWN_MS) {
+      c.isOpen = false;
+      c.failures = 0;
+    } else {
+      throw new Error(`GNANI_CIRCUIT_OPEN: ${name.toUpperCase()} circuit is open due to recent failures. Request rejected to prevent cascading errors.`);
+    }
+  }
+}
+function recordCircuitSuccess(name) {
+  circuits[name].failures = 0;
+  circuits[name].isOpen = false;
+}
+function recordCircuitFailure(name) {
+  const c = circuits[name];
+  c.failures += 1;
+  c.lastFailure = Date.now();
+  if (c.failures >= CIRCUIT_FAILURE_THRESHOLD) {
+    c.isOpen = true;
+  }
+}
+async function withRetry(fn, retries = 2, baseDelayMs = 300) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      const msg = err instanceof Error ? err.message : String(err);
+      const isTransient = /timeout|aborted|network|HTTP_5/i.test(msg);
+      if (!isTransient || attempt === retries) {
+        throw err;
+      }
+      const delay = baseDelayMs * Math.pow(2, attempt);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw lastError;
+}
 function readEnv(name) {
   const value = process.env[name];
   if (!value) return null;
@@ -24,13 +72,20 @@ function getGnaniConfig() {
     evonModel: readEnv("EVON_MODEL") || "gnani-evon-v3.3"
   };
 }
+function isKillSwitchActive() {
+  return process.env.KILL_SWITCH === "true";
+}
 function isSpeechConfigured() {
+  if (isKillSwitchActive()) return false;
   return Boolean(getGnaniConfig().apiKey);
 }
 function requireApiKey() {
+  if (isKillSwitchActive()) {
+    throw new Error("KILL_SWITCH_ACTIVE: Gnani AI services temporarily paused by admin kill switch.");
+  }
   const config = getGnaniConfig();
   if (!config.apiKey) {
-    throw new Error("CONFIG_ERROR: GNANI_API_KEY is not configured.");
+    throw new Error("CONFIG_ERROR: GNANI_API_KEY is not configured in Vercel environment variables.");
   }
   return config;
 }
@@ -59,8 +114,8 @@ function extensionForMime(mimeType) {
   return extension;
 }
 async function callPrismaStt(audioBase64, mimeType, languageCode, format = "transcribe") {
+  checkCircuit("prisma");
   const config = requireApiKey();
-  const startTime = Date.now();
   const extension = extensionForMime(mimeType);
   const audioBytes = Buffer.from(audioBase64, "base64");
   if (audioBytes.length === 0) {
@@ -71,40 +126,50 @@ async function callPrismaStt(audioBase64, mimeType, languageCode, format = "tran
   form.append("model", config.sttModel);
   form.append("language_code", languageCode || "indic-auto");
   if (format) form.append("format", format);
-  form.append("bias_list", JSON.stringify(["APMC", "mandi", "katauti", "Teja", "Agmarknet", "e-NAM", "quintal"]));
-  const response = await fetch(`${config.baseUrl}/stt/v3`, {
-    method: "POST",
-    headers: { "X-API-Key-ID": config.apiKey },
-    body: form
+  form.append("bias_list", JSON.stringify(["APMC", "mandi", "katauti", "Teja", "Agmarknet", "e-NAM", "quintal", "bhav", "sauda"]));
+  return await withRetry(async () => {
+    const startTime = Date.now();
+    try {
+      const response = await fetch(`${config.baseUrl}/stt/v3`, {
+        method: "POST",
+        headers: { "X-API-Key-ID": config.apiKey },
+        body: form,
+        signal: AbortSignal.timeout(1e4)
+        // 10s strict timeout
+      });
+      const latencyMs = Date.now() - startTime;
+      const raw = await response.text();
+      let json = {};
+      try {
+        json = raw ? JSON.parse(raw) : {};
+      } catch {
+      }
+      if (!response.ok) {
+        const detail = json.detail ?? json.error ?? json.message ?? raw;
+        const message = typeof detail === "string" ? detail : JSON.stringify(detail);
+        throw new Error(`PRISMA_HTTP_${response.status}: ${message || "transcription failed"}`);
+      }
+      if (json.success === false) {
+        const error = json.error;
+        const message = typeof error === "string" ? error : error?.message || "transcription failed";
+        throw new Error(`PRISMA_ERROR: ${message}`);
+      }
+      recordCircuitSuccess("prisma");
+      const text = typeof json.transcript === "string" ? json.transcript.trim() : "";
+      const detected = typeof json.detected_language_code === "string" ? json.detected_language_code : languageCode;
+      return {
+        text,
+        language: detected,
+        confidence: typeof json.confidence === "number" ? json.confidence : 1,
+        latencyMs: typeof json.end_to_end_latency === "number" ? Math.round(json.end_to_end_latency * 1e3) : latencyMs,
+        model: typeof json.model === "string" ? json.model : config.sttModel,
+        requestId: typeof json.request_id === "string" ? json.request_id : void 0
+      };
+    } catch (err) {
+      recordCircuitFailure("prisma");
+      throw err;
+    }
   });
-  const latencyMs = Date.now() - startTime;
-  const raw = await response.text();
-  let json = {};
-  try {
-    json = raw ? JSON.parse(raw) : {};
-  } catch {
-  }
-  if (!response.ok) {
-    const detail = json.detail ?? json.error ?? json.message ?? raw;
-    const message = typeof detail === "string" ? detail : JSON.stringify(detail);
-    throw new Error(`PRISMA_HTTP_${response.status}: ${message || "transcription failed"}`);
-  }
-  if (json.success === false) {
-    const error = json.error;
-    const message = typeof error === "string" ? error : error?.message || "transcription failed";
-    throw new Error(`PRISMA_ERROR: ${message}`);
-  }
-  const text = typeof json.transcript === "string" ? json.transcript.trim() : "";
-  const detected = typeof json.detected_language_code === "string" ? json.detected_language_code : languageCode;
-  return {
-    text,
-    language: detected,
-    // Prisma REST does not expose a confidence score; 1 means "not reported".
-    confidence: typeof json.confidence === "number" ? json.confidence : 1,
-    latencyMs: typeof json.end_to_end_latency === "number" ? Math.round(json.end_to_end_latency * 1e3) : latencyMs,
-    model: typeof json.model === "string" ? json.model : config.sttModel,
-    requestId: typeof json.request_id === "string" ? json.request_id : void 0
-  };
 }
 
 // server/functions/stt.ts
@@ -189,7 +254,7 @@ async function extractBody(request) {
   if (request.body !== void 0 && request.body !== null) {
     return serializeBody(request.body);
   }
-  if (request.method === "GET" || request.method === "HEAD") {
+  if (request.method === "GET" || request.method === "HEAD" || request.readableEnded) {
     return null;
   }
   return new Promise((resolve, reject) => {

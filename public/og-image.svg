@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1A1A3A"/>
+      <stop offset="100%" stop-color="#0E0E22"/>
+    </linearGradient>
+    <pattern id="grain" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="#F2B705" opacity="0.15"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grain)"/>
+
+  <!-- Border Frame -->
+  <rect x="24" y="24" width="1152" height="582" fill="none" stroke="#F2B705" stroke-width="8" rx="16"/>
+  <rect x="36" y="36" width="1128" height="558" fill="none" stroke="#D62828" stroke-width="3" rx="10"/>
+
+  <!-- Corner Ornaments -->
+  <text x="56" y="80" font-size="36" fill="#F2B705">✦</text>
+  <text x="1116" y="80" font-size="36" fill="#F2B705">✦</text>
+  <text x="56" y="560" font-size="36" fill="#F2B705">✦</text>
+  <text x="1116" y="560" font-size="36" fill="#F2B705">✦</text>
+
+  <!-- Header Stamp -->
+  <rect x="420" y="70" width="360" height="44" fill="#D62828" rx="8"/>
+  <text x="600" y="100" font-family="'DM Mono', monospace, sans-serif" font-size="16" font-weight="bold" fill="#FFFDF8" text-anchor="middle" letter-spacing="3">
+    DAILY MANDI COMPANION · मंडी मोल
+  </text>
+
+  <!-- Main Headline -->
+  <text x="600" y="210" font-family="'Rozha One', 'Noto Sans Devanagari', serif" font-size="76" font-weight="bold" fill="#F2B705" text-anchor="middle">
+    Mandi Mol · मंडी मोल
+  </text>
+
+  <text x="600" y="280" font-family="'Mukta', sans-serif" font-size="32" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    Live Agmarknet Prices · Net-in-Hand Sell Planner · Voice Practice
+  </text>
+
+  <!-- 4 Pillars Badge Strip -->
+  <g transform="translate(150, 340)">
+    <!-- 1. Live Prices -->
+    <rect x="0" y="0" width="200" height="120" fill="#24244E" stroke="#F2B705" stroke-width="2" rx="12"/>
+    <text x="100" y="45" font-size="32" text-anchor="middle">📊</text>
+    <text x="100" y="80" font-family="'Mukta', sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle">Aaj Ka Bhav</text>
+    <text x="100" y="102" font-family="'Mukta', sans-serif" font-size="13" fill="#CAD2C5" text-anchor="middle">Live Agmarknet Rates</text>
+
+    <!-- 2. Sell Planner -->
+    <rect x="230" y="0" width="200" height="120" fill="#24244E" stroke="#F2B705" stroke-width="2" rx="12"/>
+    <text x="330" y="45" font-size="32" text-anchor="middle">🗺️</text>
+    <text x="330" y="80" font-family="'Mukta', sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle">Sell Planner</text>
+    <text x="330" y="102" font-family="'Mukta', sans-serif" font-size="13" fill="#CAD2C5" text-anchor="middle">Net-in-Hand per Mandi</text>
+
+    <!-- 3. Bargain Practice -->
+    <rect x="460" y="0" width="200" height="120" fill="#24244E" stroke="#F2B705" stroke-width="2" rx="12"/>
+    <text x="560" y="45" font-size="32" text-anchor="middle">🎙️</text>
+    <text x="560" y="80" font-family="'Mukta', sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle">Mol-Bhav Practice</text>
+    <text x="560" y="102" font-family="'Mukta', sans-serif" font-size="13" fill="#CAD2C5" text-anchor="middle">Gnani AI Voice Agent</text>
+
+    <!-- 4. Sauda Ledger -->
+    <rect x="690" y="0" width="200" height="120" fill="#24244E" stroke="#F2B705" stroke-width="2" rx="12"/>
+    <text x="790" y="45" font-size="32" text-anchor="middle">🧾</text>
+    <text x="790" y="80" font-family="'Mukta', sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle">Sauda Ledger</text>
+    <text x="790" y="102" font-family="'Mukta', sans-serif" font-size="13" fill="#CAD2C5" text-anchor="middle">Dispute-Proof Receipts</text>
+  </g>
+
+  <!-- Footer Tagline -->
+  <text x="600" y="525" font-family="'DM Mono', monospace, sans-serif" font-size="18" font-weight="bold" fill="#F2B705" text-anchor="middle" letter-spacing="1">
+    POWERED BY GNANI AI · PRISMA STT · TIMBRE TTS · EVON REASONING
+  </text>
+</svg>
+

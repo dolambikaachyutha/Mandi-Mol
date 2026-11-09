@@ -1,4 +1,9 @@
 // server/functions/_gnani.ts
+var circuits = {
+  prisma: { failures: 0, lastFailure: 0, isOpen: false },
+  timbre: { failures: 0, lastFailure: 0, isOpen: false },
+  evon: { failures: 0, lastFailure: 0, isOpen: false }
+};
 function readEnv(name) {
   const value = process.env[name];
   if (!value) return null;
@@ -24,43 +29,97 @@ function getGnaniConfig() {
     evonModel: readEnv("EVON_MODEL") || "gnani-evon-v3.3"
   };
 }
+function isKillSwitchActive() {
+  return process.env.KILL_SWITCH === "true";
+}
 function isSpeechConfigured() {
+  if (isKillSwitchActive()) return false;
   return Boolean(getGnaniConfig().apiKey);
 }
 function isEvonConfigured() {
+  if (isKillSwitchActive()) return false;
   const config = getGnaniConfig();
   return Boolean(config.evonEndpoint && config.evonApiKey);
 }
 function getProviderStatus() {
   const config = getGnaniConfig();
-  const speechLive = Boolean(config.apiKey);
+  const kill = isKillSwitchActive();
+  const speechLive = Boolean(config.apiKey) && !kill;
   const evonLive = isEvonConfigured();
   return {
+    killSwitch: kill,
     prisma: {
-      ok: speechLive,
+      ok: speechLive && !circuits.prisma.isOpen,
+      circuitOpen: circuits.prisma.isOpen,
       mode: speechLive ? "live" : "mock",
       provider: "Gnani AI Prisma (STT)",
       model: config.sttModel
     },
     timbre: {
-      ok: speechLive,
+      ok: speechLive && !circuits.timbre.isOpen,
+      circuitOpen: circuits.timbre.isOpen,
       mode: speechLive ? "live" : "mock",
       provider: "Gnani AI Timbre (TTS)",
       model: config.ttsModel
     },
     evon: {
-      ok: evonLive,
+      ok: evonLive && !circuits.evon.isOpen,
+      circuitOpen: circuits.evon.isOpen,
       mode: evonLive ? "live" : "engine",
       provider: evonLive ? "Gnani AI Evon (LLM)" : "Deterministic engine brain",
       model: evonLive ? config.evonModel : "engine-v1"
     }
   };
 }
+async function pingGnaniProviders() {
+  const config = getGnaniConfig();
+  let baseUrlLatency = 0;
+  let evonLatency = 0;
+  let baseOk = false;
+  let evonOk = false;
+  if (config.apiKey && !isKillSwitchActive()) {
+    try {
+      const start = Date.now();
+      const res = await fetch(`${config.baseUrl}/`, {
+        method: "HEAD",
+        signal: AbortSignal.timeout(3e3)
+      }).catch(() => fetch(`${config.baseUrl}/`, { method: "GET", signal: AbortSignal.timeout(3e3) }));
+      baseUrlLatency = Date.now() - start;
+      baseOk = res.status < 500;
+    } catch {
+      baseOk = false;
+    }
+  }
+  if (config.evonEndpoint && !isKillSwitchActive()) {
+    try {
+      const start = Date.now();
+      const res = await fetch(config.evonEndpoint, {
+        method: "HEAD",
+        signal: AbortSignal.timeout(3e3)
+      }).catch(() => fetch(config.evonEndpoint, { method: "GET", signal: AbortSignal.timeout(3e3) }));
+      evonLatency = Date.now() - start;
+      evonOk = res.status < 500;
+    } catch {
+      evonOk = false;
+    }
+  }
+  return {
+    prismaPingOk: baseOk,
+    timbrePingOk: baseOk,
+    evonPingOk: evonOk,
+    latenciesMs: { baseUrl: baseUrlLatency, evon: evonLatency }
+  };
+}
 
 // server/functions/health.ts
-var handler = async () => {
+var handler = async (event) => {
   const config = getGnaniConfig();
   const status = getProviderStatus();
+  const shouldPing = event?.queryStringParameters?.ping === "1" || event?.queryStringParameters?.live === "true";
+  let livePings = null;
+  if (shouldPing) {
+    livePings = await pingGnaniProviders();
+  }
   return {
     statusCode: 200,
     headers: {
@@ -70,14 +129,28 @@ var handler = async () => {
     },
     body: JSON.stringify({
       timestamp: Date.now(),
+      status: status.killSwitch ? "PAUSED" : "OPERATIONAL",
+      killSwitch: status.killSwitch,
       configured: {
         gnani: isSpeechConfigured(),
         evon: isEvonConfigured()
       },
       baseUrl: config.baseUrl,
-      prisma: { ...status.prisma, latencyMs: 0 },
-      evon: { ...status.evon, latencyMs: 0 },
-      timbre: { ...status.timbre, latencyMs: 0 },
+      prisma: {
+        ...status.prisma,
+        latencyMs: livePings ? livePings.latenciesMs.baseUrl : 0,
+        pingOk: livePings ? livePings.prismaPingOk : void 0
+      },
+      timbre: {
+        ...status.timbre,
+        latencyMs: livePings ? livePings.latenciesMs.baseUrl : 0,
+        pingOk: livePings ? livePings.timbrePingOk : void 0
+      },
+      evon: {
+        ...status.evon,
+        latencyMs: livePings ? livePings.latenciesMs.evon : 0,
+        pingOk: livePings ? livePings.evonPingOk : void 0
+      },
       voices: config.ttsVoices
     })
   };
@@ -102,7 +175,7 @@ async function extractBody(request) {
   if (request.body !== void 0 && request.body !== null) {
     return serializeBody(request.body);
   }
-  if (request.method === "GET" || request.method === "HEAD") {
+  if (request.method === "GET" || request.method === "HEAD" || request.readableEnded) {
     return null;
   }
   return new Promise((resolve, reject) => {

@@ -25,7 +25,7 @@ async function extractBody(request: VercelRequest): Promise<string | null> {
   if (request.body !== undefined && request.body !== null) {
     return serializeBody(request.body);
   }
-  if (request.method === 'GET' || request.method === 'HEAD') {
+  if (request.method === 'GET' || request.method === 'HEAD' || request.readableEnded) {
     return null;
   }
   return new Promise((resolve, reject) => {
